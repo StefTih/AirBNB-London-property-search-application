@@ -6,16 +6,24 @@ import javafx.scene.layout.BorderPane;
 import javafx.event.ActionEvent;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 public class StatisticBox extends BorderPane {
 
-    Button leftArrow, rightArrow;
-    Label statisticName, statisticValue;
+    private View view;
+    private Button leftArrow, rightArrow;
+    private Label statisticName, statisticValue;
+    private int statisticIndex = -1;
+    private ArrayList<Statistic> statistics;
 
-    public StatisticBox() {
+    public StatisticBox(View view) {
         super();
 
+        this.view = view;
+
         initialiseComponents();
+
+        nextStatistic(null);
 
     }
 
@@ -53,15 +61,37 @@ public class StatisticBox extends BorderPane {
 
     private void previousStatistic(ActionEvent event) {
         // SHOW PREVIOUS STATISTIC
+        statistics = view.getStatistics();
+        statisticIndex = (statisticIndex-1+statistics.size())%(statistics.size());
+        while (view.statisticUsed(this, statisticIndex)) {
+            statisticIndex = (statisticIndex-1+statistics.size())%(statistics.size());
+        }
+        setStatistic();
     }
 
     private void nextStatistic(ActionEvent event) {
         // SHOW NEXT STATISTIC
+        statistics = view.getStatistics();
+        statisticIndex = (statisticIndex+1)%(statistics.size());
+        while (view.statisticUsed(this, statisticIndex)) {
+            statisticIndex = (statisticIndex+1)%(statistics.size());
+        }
+        setStatistic();
     }
 
-    private void setStatistic(String name, String value) {
-        statisticName.setText(name);
-        statisticValue.setText(value);
+    private void setStatistic() {
+        Statistic stat = statistics.get(statisticIndex);
+        statisticName.setText(stat.getName());
+        statisticValue.setText(stat.getValue());
+    }
+
+    public int getStatisticIndex() {
+        return statisticIndex;
+    }
+
+    public void update() {
+        statistics = view.getStatistics();
+        setStatistic();
     }
 
 }

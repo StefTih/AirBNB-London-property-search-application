@@ -7,8 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.geometry.Insets;
 
@@ -18,20 +17,25 @@ import java.util.Arrays;
 
 public class View extends Application {
 
-    BorderPane root;
-    Button backButton;
-    Button forwardButton;
-    ComboBox fromComboBox;
-    ComboBox toComboBox;
-    Integer fromPrice;
-    Integer toPrice;
+    private AirbnbDataLoader dataLoader = new AirbnbDataLoader();
+    private ArrayList<AirbnbListing> properties = dataLoader.load();
 
-    ArrayList<Parent> centerPanels;
-    Parent welcomePanel = new Label("Welcome");
-    Parent mapPanel = new Label("Map");
-    Parent statisticsPanel = new Label("Statistics");
-    int panelIndex = 0;
+    private BorderPane root;
+    private Button backButton;
+    private Button forwardButton;
+    private ComboBox fromComboBox;
+    private ComboBox toComboBox;
+    private Integer fromPrice;
+    private Integer toPrice;
 
+    private ArrayList<Parent> centerPanels;
+    private Parent welcomePanel = new Label("Welcome");
+    private Parent mapPanel = new Label("Map");
+    private GridPane statisticsPanel;
+    private int panelIndex = 0;
+
+    private ArrayList<Statistic> statistics;
+    private ArrayList<StatisticBox> statisticBoxes;
 
 
     public static void main(String[] args) {
@@ -50,6 +54,9 @@ public class View extends Application {
         primaryStage.show();
 
         initialiseApplicationWindow();
+
+        computeStatistics();
+        initialiseStatisticsPanel();
 
         centerPanels = new ArrayList<Parent>(Arrays.asList(welcomePanel, mapPanel, statisticsPanel));
         root.setCenter(centerPanels.get(0));
@@ -101,6 +108,7 @@ public class View extends Application {
             fromPrice = null;
         }
         enableButtons();
+        computeProperties();
     }
 
     private void toComboBoxAction(Event event) {
@@ -111,16 +119,17 @@ public class View extends Application {
             toPrice = null;
         }
         enableButtons();
+        computeProperties();
     }
 
     private void enableButtons()
     {
-        boolean invalidPriceRange = checkInvalidPriceRange();
-        backButton.setDisable(invalidPriceRange);
-        forwardButton.setDisable(invalidPriceRange);
+        boolean invalidRange = invalidPriceRange();
+        backButton.setDisable(invalidRange);
+        forwardButton.setDisable(invalidRange);
     }
 
-    private boolean checkInvalidPriceRange() {
+    private boolean invalidPriceRange() {
         if (fromPrice != null && toPrice != null) {
             //If the price range is invalid
             if (toPrice-fromPrice < 0) {
@@ -150,6 +159,105 @@ public class View extends Application {
     {
         for (String item: items) {
             comboBox.getItems().add(item);
+        }
+    }
+
+    private void computeProperties() {
+        if (! invalidPriceRange()) {
+            properties = dataLoader.load();
+
+            properties.removeIf(p -> (p.getPrice() < fromPrice || p.getPrice() > toPrice));
+
+            computeStatistics();
+
+            updateStatistics();
+        }
+    }
+
+
+    private void computeStatistics() {
+        statistics = new ArrayList<>();
+
+        // Compute number of reviews
+        String statName = "Average number of reviews per property";
+        if (properties.isEmpty()) {
+            statistics.add(new Statistic(statName, "-"));
+        } else {
+            double count = 0;
+            for (AirbnbListing property : properties) {
+                count += property.getNumberOfReviews();
+            }
+            statistics.add(new Statistic(statName, String.valueOf(count/properties.size())));
+        }
+
+        // Compute number of available properties
+        statName = "Total number of available properties";
+        statistics.add(new Statistic(statName, String.valueOf(properties.size())));
+
+        // Compute number of entire homes and apartments
+        statName = "Number of entire homes and apartments";
+        statistics.add(new Statistic(statName,
+            String.valueOf(properties.stream().filter(p -> (p.getRoom_type().equals("Entire home/apt"))).count())
+        ));
+
+        // Compute most expensive borough
+        statName = "Most expensive borough";
+        // TO CHANGE
+        statistics.add(new Statistic(statName, "Waiting for list of boroughs"));
+
+        // TEST TO REMOVE
+        statistics.add(new Statistic("Test", "Test Value"));
+
+    }
+
+
+    private void initialiseStatisticsPanel() {
+        statisticsPanel = new GridPane();
+        statisticsPanel.setPadding(new Insets(10,10,10,10));
+        statisticsPanel.setHgap(50);
+        statisticsPanel.setVgap(50);
+        ColumnConstraints columnConstraints = new ColumnConstraints();
+        columnConstraints.setPercentWidth(50);
+        statisticsPanel.getColumnConstraints().add(columnConstraints);
+        statisticsPanel.getColumnConstraints().add(columnConstraints);
+        RowConstraints rowConstraints = new RowConstraints();
+        rowConstraints.setPercentHeight(50);
+        statisticsPanel.getRowConstraints().add(rowConstraints);
+        statisticsPanel.getRowConstraints().add(rowConstraints);
+
+
+        statisticBoxes = new ArrayList<>();
+        StatisticBox statisticBox1 = new StatisticBox(this);
+        statisticsPanel.add(statisticBox1, 0, 0);
+        statisticBoxes.add(statisticBox1);
+        StatisticBox statisticBox2 = new StatisticBox(this);
+        statisticsPanel.add(statisticBox2, 0, 1);
+        statisticBoxes.add(statisticBox2);
+        StatisticBox statisticBox3 = new StatisticBox(this);
+        statisticsPanel.add(statisticBox3, 1, 0);
+        statisticBoxes.add(statisticBox3);
+        StatisticBox statisticBox4 = new StatisticBox(this);
+        statisticsPanel.add(statisticBox4, 1, 1);
+        statisticBoxes.add(statisticBox4);
+
+    }
+
+    public ArrayList<Statistic> getStatistics() {
+        return statistics;
+    }
+
+    public boolean statisticUsed(StatisticBox statisticBox, int index) {
+        for (StatisticBox box: statisticBoxes) {
+            if (box != statisticBox && box.getStatisticIndex() == index) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void updateStatistics() {
+        for (StatisticBox box: statisticBoxes) {
+            box.update();
         }
     }
 

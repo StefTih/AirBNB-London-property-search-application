@@ -31,7 +31,7 @@ public class StatisticBox extends BorderPane {
         setLeft(leftArrow);
 
         rightArrow = new Button(">");
-        rightArrow.setPrefSize(0.04*screenWidth, 0.04*screenHeight);
+        rightArrow.setPrefSize(0.04*screenWidth, 0.4*screenHeight);
         rightArrow.setAlignment(Pos.CENTER);
         rightArrow.setOnAction(this:: nextStatistic);
         setRight(rightArrow);

@@ -7,8 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.geometry.Insets;
 
@@ -29,7 +28,7 @@ public class View extends Application {
     ArrayList<Parent> centerPanels;
     Parent welcomePanel = new Label("Welcome");
     Parent mapPanel = new Label("Map");
-    Parent statisticsPanel = new Label("Statistics");
+    GridPane statisticsPanel;
     int panelIndex = 0;
 
 
@@ -50,6 +49,8 @@ public class View extends Application {
         primaryStage.show();
 
         initialiseApplicationWindow();
+
+        initialiseStatisticsPanel();
 
         centerPanels = new ArrayList<Parent>(Arrays.asList(welcomePanel, mapPanel, statisticsPanel));
         root.setCenter(centerPanels.get(0));
@@ -151,6 +152,32 @@ public class View extends Application {
         for (String item: items) {
             comboBox.getItems().add(item);
         }
+    }
+
+
+    private void initialiseStatisticsPanel() {
+        statisticsPanel = new GridPane();
+        statisticsPanel.setPadding(new Insets(10,10,10,10));
+        statisticsPanel.setHgap(50);
+        statisticsPanel.setVgap(50);
+        ColumnConstraints columnConstraints = new ColumnConstraints();
+        columnConstraints.setPercentWidth(50);
+        statisticsPanel.getColumnConstraints().add(columnConstraints);
+        statisticsPanel.getColumnConstraints().add(columnConstraints);
+        RowConstraints rowConstraints = new RowConstraints();
+        rowConstraints.setPercentHeight(50);
+        statisticsPanel.getRowConstraints().add(rowConstraints);
+        statisticsPanel.getRowConstraints().add(rowConstraints);
+
+        StatisticBox statisticBox1 = new StatisticBox();
+        statisticsPanel.add(statisticBox1, 0, 0);
+        StatisticBox statisticBox2 = new StatisticBox();
+        statisticsPanel.add(statisticBox2, 0, 1);
+        StatisticBox statisticBox3 = new StatisticBox();
+        statisticsPanel.add(statisticBox3, 1, 0);
+        StatisticBox statisticBox4 = new StatisticBox();
+        statisticsPanel.add(statisticBox4, 1, 1);
+
     }
 
 

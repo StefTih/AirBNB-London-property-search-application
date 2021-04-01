@@ -7,11 +7,21 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.geometry.Insets;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.MenuBar;
+import javafx.scene.text.*;
 
 import java.awt.*;
+//import java.awt.ScrollPane;
+//import java.awt.MenuBar;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -30,12 +40,23 @@ public class View extends Application {
 
     private ArrayList<Parent> centerPanels;
     private Parent welcomePanel = new Label("Welcome");
-    private Parent mapPanel = new Label("Map");
+    private BorderPane mapPanel;
     private GridPane statisticsPanel;
     private int panelIndex = 0;
 
     private ArrayList<Statistic> statistics;
     private ArrayList<StatisticBox> statisticBoxes;
+
+    //Stores an object of the array which contains all the borough names and their grid pane coordinates
+    private BorderPane root2;
+    //Stores an object containing the current properties available to show and extract from the map
+    private MapInfo mapInfo;
+    //A scrollbar for the property search window for each neighbourhood
+    private ScrollPane scrollBar;
+    //Stores the buttons that represent the neighbourhoods on the map
+    private ArrayList<Button> mapButtons;
+    //Stores the buttons that represent the properties in each neighbourhood
+    private ArrayList<Button> propertyButtons;
 
 
     public static void main(String[] args) {
@@ -58,10 +79,16 @@ public class View extends Application {
         computeStatistics();
         initialiseStatisticsPanel();
 
+        //Initialising the map panel in the GUI
+        addBoroughsToMap();
+        initialiseMapPanel();
+
         centerPanels = new ArrayList<Parent>(Arrays.asList(welcomePanel, mapPanel, statisticsPanel));
         root.setCenter(centerPanels.get(0));
 
     }
+
+    // Application window methods
 
     private void initialiseApplicationWindow() {
         BorderPane topBar = new BorderPane();
@@ -162,6 +189,299 @@ public class View extends Application {
         }
     }
 
+    //Welcome window methods
+
+    //Map window methods
+
+    /**
+     * This method populates the map with neighbourhoods
+     */
+    private void addBoroughsToMap()
+    {
+        mapInfo = new MapInfo();
+        mapInfo.addBoroughs(0, "Enfield", "0", "7");
+        mapInfo.addBoroughs(1, "Barnet", "1", "4");
+        mapInfo.addBoroughs(2, "Haringey", "1", "6");
+        mapInfo.addBoroughs(3, "Waltham Forest", "1", "8");
+        mapInfo.addBoroughs(4, "Harrow", "2", "1");
+        mapInfo.addBoroughs(5, "Brent", "2", "3");
+        mapInfo.addBoroughs(6, "Camden", "2", "5");
+        mapInfo.addBoroughs(7, "Islington", "2", "7");
+        mapInfo.addBoroughs(8, "Hackney", "2", "9");
+        mapInfo.addBoroughs(9, "Redbridge", "2", "11");
+        mapInfo.addBoroughs(10, "Havering", "2", "13");
+        mapInfo.addBoroughs(11, "Hillingdon", "3", "0");
+        mapInfo.addBoroughs(12, "Ealing", "3", "2");
+        mapInfo.addBoroughs(13, "Kensington and Chelsea", "3", "4");
+        mapInfo.addBoroughs(14, "Westminster", "3", "6");
+        mapInfo.addBoroughs(15, "Tower Hamlets", "3", "8");
+        mapInfo.addBoroughs(16, "Newham", "3", "10");
+        mapInfo.addBoroughs(17, "Barking and Dagenham", "3", "12");
+        mapInfo.addBoroughs(18, "Hounslow", "4", "1");
+        mapInfo.addBoroughs(19, "Hammersmith and Fulham", "4", "3");
+        mapInfo.addBoroughs(20, "Wandsworth", "4", "5");
+        mapInfo.addBoroughs(21, "City of London", "4", "7");
+        mapInfo.addBoroughs(22, "Greenwich", "4", "9");
+        mapInfo.addBoroughs(23, "Bexley", "4", "11");
+        mapInfo.addBoroughs(24, "Richmond upon Thames", "5", "2");
+        mapInfo.addBoroughs(25, "Merton", "5", "4");
+        mapInfo.addBoroughs(26, "Lambeth", "5", "6");
+        mapInfo.addBoroughs(27, "Southwark", "5", "8");
+        mapInfo.addBoroughs(28, "Lewisham", "5", "11");
+        mapInfo.addBoroughs(29, "Kingston upon Thames", "6", "3");
+        mapInfo.addBoroughs(30, "Sutton", "6", "5");
+        mapInfo.addBoroughs(31, "Croydon", "6", "7");
+        mapInfo.addBoroughs(32, "Bromley", "6", "9");
+
+
+    }
+
+    /**
+    This method creates the user interface for the map panel.
+    **/
+    private void initialiseMapPanel()
+    {
+
+        mapPanel = new BorderPane();
+        //Create a top label with a message in it
+        Label top = new Label("This the map of all the London boroughs and a relative " +
+                "comparison to number of available properties in each borough");
+        top.setAlignment(Pos.CENTER);
+        top.setFont(Font.font("Arial",FontWeight.BOLD,16));
+        top.setTextFill(Color.INDIANRED);
+        mapPanel.setTop(top);
+        BorderPane.setMargin(top,new Insets(5));
+
+        //Creates the map of the London boroughs in the center panel
+        GridPane center = createMap();
+        mapPanel.setCenter(center);
+        BorderPane.setMargin(center,new Insets(5));
+
+        //Create a VBOX pane which stores all the labels for the key
+        //each one explaining the volume of properties in each borough
+        VBox bottom = new VBox();
+
+        Label key = new Label("Key:");
+        key.setFont(Font.font("Arial",FontWeight.BOLD,12));
+
+        Label lowVol = new Label("Low Volume of Properties: red " );
+        lowVol.setFont(Font.font("Arial",FontWeight.BOLD,12));
+        lowVol.styleProperty().set(mapInfo.getLowVol());
+
+        Label medVol = new Label("Medium Volume of Properties: yellow");
+        medVol.styleProperty().set(mapInfo.getMedVol());
+        medVol.setFont(Font.font("Arial",FontWeight.BOLD,12));
+
+        Label highVol = new Label("High Volume of Properties: green");
+        highVol.styleProperty().set(mapInfo.getHighVol());
+        highVol.setFont(Font.font("Arial",FontWeight.BOLD,12));
+
+        bottom.getChildren().addAll(key,lowVol,medVol,highVol);
+
+
+        mapPanel.setBottom(bottom);
+        BorderPane.setMargin(bottom,new Insets(5));
+
+    }
+
+    /**
+     * This method creates a new grid pane which will help in the creation of the map
+     */
+    private GridPane createMap()
+    {
+        GridPane boroughMap = new GridPane();
+        Integer xCoordinate;
+        Integer yCoordinate;
+
+        mapButtons = new ArrayList<>();
+        for(String[] borough: mapInfo.getLondonBoroughs())
+        {
+
+            xCoordinate = mapInfo.convertInt(borough[1]);
+            yCoordinate = mapInfo.convertInt(borough[2]);
+            if (xCoordinate!=-1 && yCoordinate!=-1)
+            {
+                Button BOR = new Button(borough[0]);
+                BOR.setOnAction(p -> showPropertiesInBorough(borough[0]));
+                mapButtons.add(BOR);
+                boroughMap.add(BOR,xCoordinate,yCoordinate);
+            }
+            else
+            {
+                System.out.println("The coordinates cannot be entered because they are not of Int type!");
+            }
+
+        }
+        setColour(mapButtons);
+        return boroughMap;
+
+    }
+
+    /**
+     * This method creates a new window if a button is clicked on the map. This window will show every
+     * property in the neighbourhood chosen that is for rent at that given price.
+     * @param boroughName the name of the borough is returned.
+     */
+    private void showPropertiesInBorough(String boroughName)
+    {
+        //Setting up the new stage
+        Stage secondaryStage = new Stage();
+        secondaryStage.setTitle(boroughName);
+
+        //Getting the dimensions of the screen
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+
+        //Creating the new Border pane
+        root2 = new BorderPane();
+
+        //Creating the top menu options
+        makeMenuBar(boroughName);
+
+        //Creating the scrollbar and setting it to the center of the pane
+        scrollBar = new ScrollPane();
+        scrollBar.setContent(addPropertyInfo(boroughName));
+        root2.setCenter(scrollBar);
+
+        //Creating the scene of the stage
+        secondaryStage.setScene(new Scene(root2, 0.6*screenSize.getWidth(), 0.6*screenSize.getHeight()));
+        secondaryStage.show();
+
+    }
+
+    /**
+     * This method creates the menu bar which contains the sorting options for the user
+     */
+    private void makeMenuBar(String boroughName)
+    {
+        MenuBar menuBar = new MenuBar();
+
+        // create the sort menu
+        Menu sortMenu = new Menu("Sort By");
+
+        MenuItem numReviews = new MenuItem("Number of Reviews");
+        numReviews.setOnAction(p -> sortByNumReviews(boroughName));
+
+        MenuItem price = new MenuItem("Price - cheapest to most expensive");
+        price.setOnAction(p -> sortByPrice(boroughName));
+
+        MenuItem hostName = new MenuItem("Host name");
+        hostName.setOnAction(p -> sortByHostName(boroughName));
+
+        sortMenu.getItems().addAll(numReviews,price,hostName);
+        menuBar.getMenus().addAll(sortMenu);
+        root2.setTop(menuBar);
+
+    }
+
+    /**
+     * This method calls the sorting method in the MapInfo class based on number of reviews.
+     * @param boroughName the parameter which stores the name of the neighbourhood
+     */
+    private void sortByNumReviews(String boroughName)
+    {
+        mapInfo.sortPropertyByNumReviews();
+        refresh(boroughName);
+    }
+
+    /**
+     * This method calls the sorting method in the MapInfo class based on price.
+     * @param boroughName the parameter which stores the name of the neighbourhood
+     */
+    private void sortByPrice(String boroughName)
+    {
+        mapInfo.sortPropertyByPrice();
+        refresh(boroughName);
+    }
+
+    /**
+     * This method calls the sorting method in the MapInfo class based on host name alphabetically.
+     * @param boroughName the parameter which stores the name of the neighbourhood
+     */
+    private void sortByHostName(String boroughName)
+    {
+        mapInfo.sortPropertyByHostName();
+        refresh(boroughName);
+    }
+
+    /**
+     * resets the contents inside the ScrollPane to represent the new sorted list of properties
+     * @param boroughName the parameter which stores the name of the neighbourhood
+     */
+    private void refresh(String boroughName)
+    {
+        scrollBar.setContent(addPropertyInfo(boroughName));
+        mapInfo.setPropertyData(properties);
+    }
+
+    /**
+     * This method includes all the property info for each property for a specific neighbourhood
+     * and represents its details as buttons.
+     * @param boroughName the name of the neighbourhood as a String
+     * @return the vBox pane which stores all the buttons stacked one on to of the other.
+     */
+    private VBox addPropertyInfo(String boroughName)
+    {
+        VBox vBox = new VBox();
+
+        Insets vBoxPadding = new Insets(10, 10, 10, 10);
+        vBox.setAlignment(Pos.TOP_CENTER);
+        propertyButtons = new ArrayList<>();
+
+
+        for(AirbnbListing propertyInfo: mapInfo.getPropertyList(boroughName))
+        {
+
+            Button property = new Button("Host of the property: "+propertyInfo.getHost_name()
+                    + "\nPrice: "+propertyInfo.getPrice()
+                    +"\nNumber of reviews: "+propertyInfo.getNumberOfReviews()
+                    +"\nMinimum number of nights that someone can stay: "+propertyInfo.getMinimumNights());
+            property.setPadding(vBoxPadding);
+            propertyButtons.add(property);
+            property.setOnAction(p ->showDescription(propertyInfo.getId()));
+        }
+
+        vBox.getChildren().addAll(propertyButtons);
+        return vBox;
+    }
+
+    /**
+     * This method shows the description of each property on the right side of the border pane
+     * @param propertyID holds the id of the property as a string
+     */
+    private void showDescription(String propertyID)
+    {
+        Label propertyDescription = new Label(mapInfo.showPropertyDescription(propertyID));
+        root2.setRight(propertyDescription);
+    }
+
+    /**
+     *Updates the colour of the map every time the user changes the price of the property
+     * @param buttons It stores as a parameter an ArrayList of all the buttons which represent boroughs
+     *                in the borough map.
+     */
+    private void setColour(ArrayList<Button> buttons)
+    {
+        for(Button button: buttons)
+        {
+            button.styleProperty().set(changeColour(button.getText()));
+        }
+
+    }
+
+    /**
+     * This method stores as a parameter the name of the borough/neighbourhood and using the name calls
+     * a public method from the MapInfo class which will return instead a string with the appropriate
+     * colour to set for this button on the map.
+     * @param neighbourhood a string which contains the name of the neighbourhood
+     * @return a CSS colour style string.
+     */
+    private String changeColour(String neighbourhood)
+    {
+        return mapInfo.propertyVolumeColour(neighbourhood);
+    }
+
+    //Statistics window methods
+
     private void computeProperties() {
         if (! invalidPriceRange()) {
             properties = dataLoader.load();
@@ -171,6 +491,12 @@ public class View extends Application {
             computeStatistics();
 
             updateStatistics();
+
+            //Updates the details regarding the map panel
+            mapInfo.setPropertyData(properties);
+
+            setColour(mapButtons);
+
         }
     }
 

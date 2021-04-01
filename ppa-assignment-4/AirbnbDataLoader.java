@@ -65,12 +65,10 @@ public class AirbnbDataLoader {
             return Double.parseDouble(doubleString);
         }
         return -1.0;
-    }
-
-    /**
+    }/**
      *
      * @param intString the string to be converted to Integer type
-     * @return the Integer value of the string, or -1 if the string is 
+     * @return the Integer value of the string, or -1 if the string is
      * either empty or just whitespace
      */
     private Integer convertInt(String intString){
@@ -79,5 +77,7 @@ public class AirbnbDataLoader {
         }
         return -1;
     }
+
+
 
 }

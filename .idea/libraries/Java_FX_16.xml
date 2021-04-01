@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="Java FX 16">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/ppa-assignment-4/+libs/commons-text-1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ppa-assignment-4/+libs/opencsv-4.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ppa-assignment-4/+libs/commons-lang3-3.7.jar!/" />
+      <root url="file://$USER_HOME$/Downloads/openjfx-16_windows-x64_bin-sdk/javafx-sdk-16/lib" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$USER_HOME$/Downloads/openjfx-16_windows-x64_bin-sdk/javafx-sdk-16/lib" />
+    </SOURCES>
+    <jarDirectory url="file://$USER_HOME$/Downloads/openjfx-16_windows-x64_bin-sdk/javafx-sdk-16/lib" recursive="false" />
+    <jarDirectory url="file://$USER_HOME$/Downloads/openjfx-16_windows-x64_bin-sdk/javafx-sdk-16/lib" recursive="false" type="SOURCES" />
+  </library>
+</component>

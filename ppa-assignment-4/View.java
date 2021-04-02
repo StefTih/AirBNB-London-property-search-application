@@ -199,40 +199,42 @@ public class View extends Application {
     private void addBoroughsToMap()
     {
         mapInfo = new MapInfo();
-        mapInfo.addBoroughs(0, "Enfield", "0", "7");
-        mapInfo.addBoroughs(1, "Barnet", "1", "4");
-        mapInfo.addBoroughs(2, "Haringey", "1", "6");
-        mapInfo.addBoroughs(3, "Waltham Forest", "1", "8");
-        mapInfo.addBoroughs(4, "Harrow", "2", "1");
-        mapInfo.addBoroughs(5, "Brent", "2", "3");
-        mapInfo.addBoroughs(6, "Camden", "2", "5");
-        mapInfo.addBoroughs(7, "Islington", "2", "7");
-        mapInfo.addBoroughs(8, "Hackney", "2", "9");
-        mapInfo.addBoroughs(9, "Redbridge", "2", "11");
-        mapInfo.addBoroughs(10, "Havering", "2", "13");
-        mapInfo.addBoroughs(11, "Hillingdon", "3", "0");
-        mapInfo.addBoroughs(12, "Ealing", "3", "2");
-        mapInfo.addBoroughs(13, "Kensington and Chelsea", "3", "4");
-        mapInfo.addBoroughs(14, "Westminster", "3", "6");
-        mapInfo.addBoroughs(15, "Tower Hamlets", "3", "8");
-        mapInfo.addBoroughs(16, "Newham", "3", "10");
-        mapInfo.addBoroughs(17, "Barking and Dagenham", "3", "12");
-        mapInfo.addBoroughs(18, "Hounslow", "4", "1");
-        mapInfo.addBoroughs(19, "Hammersmith and Fulham", "4", "3");
-        mapInfo.addBoroughs(20, "Wandsworth", "4", "5");
-        mapInfo.addBoroughs(21, "City of London", "4", "7");
-        mapInfo.addBoroughs(22, "Greenwich", "4", "9");
-        mapInfo.addBoroughs(23, "Bexley", "4", "11");
-        mapInfo.addBoroughs(24, "Richmond upon Thames", "5", "2");
-        mapInfo.addBoroughs(25, "Merton", "5", "4");
-        mapInfo.addBoroughs(26, "Lambeth", "5", "6");
-        mapInfo.addBoroughs(27, "Southwark", "5", "8");
-        mapInfo.addBoroughs(28, "Lewisham", "5", "11");
-        mapInfo.addBoroughs(29, "Kingston upon Thames", "6", "3");
-        mapInfo.addBoroughs(30, "Sutton", "6", "5");
-        mapInfo.addBoroughs(31, "Croydon", "6", "7");
-        mapInfo.addBoroughs(32, "Bromley", "6", "9");
+        mapInfo.addBoroughs(0, "Enfield", "7", "0");
+        mapInfo.addBoroughs(1, "Barnet", "4", "1");
+        mapInfo.addBoroughs(2, "Haringey", "6", "1");
+        mapInfo.addBoroughs(3, "Waltham Forest", "8", "1");
+        mapInfo.addBoroughs(4, "Harrow", "1", "2");
+        mapInfo.addBoroughs(5, "Brent", "3", "2");
+        mapInfo.addBoroughs(6, "Camden", "5", "2");
+        mapInfo.addBoroughs(7, "Islington", "7", "2");
+        mapInfo.addBoroughs(8, "Hackney", "9", "2");
+        mapInfo.addBoroughs(9, "Redbridge", "11", "2");
+        mapInfo.addBoroughs(10, "Havering", "13", "2");
+        mapInfo.addBoroughs(11, "Hillingdon", "0", "3");
+        mapInfo.addBoroughs(12, "Ealing", "2", "3");
+        mapInfo.addBoroughs(13, "Kensington and Chelsea", "4", "3");
+        mapInfo.addBoroughs(14, "Westminster", "6", "3");
+        mapInfo.addBoroughs(15, "Tower Hamlets", "8", "3");
+        mapInfo.addBoroughs(16, "Newham", "10", "3");
+        mapInfo.addBoroughs(17, "Barking and Dagenham", "12", "3");
+        mapInfo.addBoroughs(18, "Hounslow", "1", "4");
+        mapInfo.addBoroughs(19, "Hammersmith and Fulham", "3", "4");
+        mapInfo.addBoroughs(20, "Wandsworth", "5", "4");
+        mapInfo.addBoroughs(21, "City of London", "7", "4");
+        mapInfo.addBoroughs(22, "Greenwich", "9", "4");
+        mapInfo.addBoroughs(23, "Bexley", "11", "4");
+        mapInfo.addBoroughs(24, "Richmond upon Thames", "2", "5");
+        mapInfo.addBoroughs(25, "Merton", "4", "5");
+        mapInfo.addBoroughs(26, "Lambeth", "6", "5");
+        mapInfo.addBoroughs(27, "Southwark", "8", "5");
+        mapInfo.addBoroughs(28, "Lewisham", "10", "5");
+        mapInfo.addBoroughs(29, "Kingston upon Thames", "3", "6");
+        mapInfo.addBoroughs(30, "Sutton", "5", "6");
+        mapInfo.addBoroughs(31, "Croydon", "7", "6");
+        mapInfo.addBoroughs(32, "Bromley", "9", "6");
 
+
+        linkAbbreviations();
 
     }
 
@@ -254,6 +256,8 @@ public class View extends Application {
         //Create a top label with a message in it
         Label top = new Label("This the map of all the London boroughs and a relative " +
                 "comparison to number of available properties in each borough");
+        //It will center the label in the center
+        top.setMaxWidth(Double.MAX_VALUE);
         top.setAlignment(Pos.CENTER);
         top.setFont(Font.font("Arial",FontWeight.BOLD,16));
         top.setTextFill(Color.INDIANRED);
@@ -262,6 +266,13 @@ public class View extends Application {
 
         //Creates the map of the London boroughs in the center panel
         GridPane center = createMap();
+        //It will center the label in the center
+        center.setMaxWidth(Double.MAX_VALUE);
+        center.setAlignment(Pos.CENTER);
+        //Creates a verticaly gap between the buttons
+        center.setVgap(10);
+        //Sets the padding between the map and the edges of the window
+        center.setPadding(new Insets(0, 50, 0, 50));
         mapPanel.setCenter(center);
         BorderPane.setMargin(center,new Insets(5));
 

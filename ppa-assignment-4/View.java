@@ -19,11 +19,7 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.text.*;
 
 import java.awt.*;
-//import java.awt.ScrollPane;
-//import java.awt.MenuBar;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 
 public class View extends Application {
 
@@ -76,12 +72,12 @@ public class View extends Application {
 
         initialiseApplicationWindow();
 
-        computeStatistics();
-        initialiseStatisticsPanel();
-
         //Initialising the map panel in the GUI
         addBoroughsToMap();
         initialiseMapPanel();
+
+        computeStatistics();
+        initialiseStatisticsPanel();
 
         centerPanels = new ArrayList<Parent>(Arrays.asList(welcomePanel, mapPanel, statisticsPanel));
         root.setCenter(centerPanels.get(0));
@@ -117,11 +113,12 @@ public class View extends Application {
         Label fromLabel = new Label("From: ");
         Label toLabel = new Label("To: ");
         fromComboBox = new ComboBox();
-        String[] fromItems = new String[] {"0", "100", "200"};
+        String[] fromItems = new String[] {
+                "0", "50", "100", "150", "200", "250", "300", "350", "400", "450", "500", "1000"};
         addItemsToComboBox(fromComboBox, fromItems);
         fromComboBox.setOnAction(this:: fromComboBoxAction);
         toComboBox = new ComboBox();
-        String[] toItems = new String[] {"100","200", "300"};
+        String[] toItems = new String[] {"50", "100", "150", "200", "250", "300", "350", "400", "450", "500", "1000", "10000"};
         addItemsToComboBox(toComboBox, toItems);
         toComboBox.setOnAction(this:: toComboBoxAction);
         priceRangeComponents.getChildren().addAll(fromLabel, fromComboBox, toLabel, toComboBox);
@@ -516,6 +513,7 @@ public class View extends Application {
 
             setColour(mapButtons);
 
+            int maxPrice = 0;
         }
     }
 
@@ -548,10 +546,12 @@ public class View extends Application {
         // Compute most expensive borough
         statName = "Most expensive borough";
         // TO CHANGE
-        statistics.add(new Statistic(statName, "Waiting for list of boroughs"));
+        statistics.add(new Statistic(statName, mostExpensiveBorough()));
 
         // TEST TO REMOVE
         statistics.add(new Statistic("Test", "Test Value"));
+
+        // ADD 4 STATS
 
     }
 
@@ -584,6 +584,52 @@ public class View extends Application {
         StatisticBox statisticBox4 = new StatisticBox(this);
         statisticsPanel.add(statisticBox4, 1, 1);
         statisticBoxes.add(statisticBox4);
+
+    }
+
+    /**
+     * Calculates the most expensive borough in London (according to current price range) by comparing
+     * the average property price per borough
+     * @return The most expensive borough
+     */
+    private String mostExpensiveBorough() {
+        Dictionary<String, Integer> boroughPrices = new Hashtable<>();
+
+        // Calculate the total price of each borough
+        for (AirbnbListing property: properties) {
+            String neighbourhood = property.getNeighbourhood();
+            int price = property.getPrice() * property.getMinimumNights();
+            Integer currentBoroughPrice = boroughPrices.get(neighbourhood);
+            if (currentBoroughPrice == null) {
+                boroughPrices.put(neighbourhood, price);
+            } else {
+                boroughPrices.put(neighbourhood, currentBoroughPrice + price);
+            }
+        }
+
+        // Find borough with largest average property price
+        String mostExpensiveBorough = null;
+        double largestAveragePropertyPrice = 0;
+        Enumeration<String> boroughsEnum = boroughPrices.keys();
+        while (boroughsEnum.hasMoreElements()) {
+            String borough = boroughsEnum.nextElement();
+            double price = 0;
+            int count = 0; // Number of properties in borough
+            Integer propertyPrice = boroughPrices.get(borough);
+            while (propertyPrice != null) {
+                price += propertyPrice;
+                ++count;
+                boroughPrices.remove(borough);
+                propertyPrice = boroughPrices.get(borough);
+            }
+            double averagePropertyPrice = price / count; // Average price per property in borough
+            if (averagePropertyPrice > largestAveragePropertyPrice) {
+                mostExpensiveBorough = borough;
+                largestAveragePropertyPrice = averagePropertyPrice;
+            }
+        }
+
+        return mostExpensiveBorough;
 
     }
 

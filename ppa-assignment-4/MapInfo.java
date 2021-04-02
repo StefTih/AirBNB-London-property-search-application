@@ -1,6 +1,4 @@
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Collections;
+import java.util.*;
 
 /**
  * Represents the properties currently available on the map of London Boroughs based on the price
@@ -20,7 +18,7 @@ public class MapInfo {
     // Then boundary for number of properties available going from the mid to high boundary
     private static final int MID_HIGH_BOUNDARY = 2000;
     //Colour for low volume number of properties
-    private static final String LOW_VOL = "-fx-background-color:#FF0000";
+    private static final String LOW_VOL = "-fx-background-color:#FFCCCB";
     //Colour for medium volume number of properties
     private static final String MED_VOL = "-fx-background-color:#FFFF00";
     //Colour for low high volume number of properties
@@ -30,11 +28,15 @@ public class MapInfo {
     private String[][] LondonBoroughs;
     //An array storing a list of all the properties of all homes on sale
     private ArrayList<AirbnbListing> propertyList = new ArrayList<>();
-    //The name of the property that is currently
-
+    //The abbreviations of the neighbourhoods represented on the map
+    private Map<String,String> LondonAbbreviations;
+    /**
+     * The constructor initialises the 2d array.
+     */
     public MapInfo()
     {
         LondonBoroughs = new String[NUM_BOROUGHS][INFO_INDEX];
+        LondonAbbreviations = new HashMap<String,String>();
     }
 
     /**
@@ -93,6 +95,28 @@ public class MapInfo {
         }
     }
 
+    public void addAbbreviations(String abbreviation, String borough)
+    {
+        LondonAbbreviations.put(abbreviation,borough);
+    }
+
+    public String getNeighbourhood(String abbreviation)
+    {
+        return LondonAbbreviations.get(abbreviation);
+    }
+
+    public String getAbbreviation(String borough)
+    {
+        String key = null;
+        for(String keys:LondonAbbreviations.keySet())
+        {
+            if(LondonAbbreviations.get(keys).equals(borough))
+            {
+                key = keys;
+            }
+        }
+        return key;
+    }
     /**
      * For extensibility purposes we included a accessor method which can access the total number
      * of neighbourhoods on the map.

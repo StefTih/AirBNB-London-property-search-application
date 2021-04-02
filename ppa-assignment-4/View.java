@@ -236,6 +236,14 @@ public class View extends Application {
 
     }
 
+    private void linkAbbreviations()
+    {
+        for (String[] neighbourhoods: mapInfo.getLondonBoroughs())
+        {
+            mapInfo.addAbbreviations(neighbourhoods[0].substring(0,4).toUpperCase(),neighbourhoods[0]);
+        }
+    }
+
     /**
     This method creates the user interface for the map panel.
     **/
@@ -301,7 +309,7 @@ public class View extends Application {
             yCoordinate = mapInfo.convertInt(borough[2]);
             if (xCoordinate!=-1 && yCoordinate!=-1)
             {
-                Button BOR = new Button(borough[0]);
+                Button BOR = new Button(mapInfo.getAbbreviation(borough[0]));
                 BOR.setOnAction(p -> showPropertiesInBorough(borough[0]));
                 mapButtons.add(BOR);
                 boroughMap.add(BOR,xCoordinate,yCoordinate);
@@ -463,7 +471,7 @@ public class View extends Application {
     {
         for(Button button: buttons)
         {
-            button.styleProperty().set(changeColour(button.getText()));
+            button.styleProperty().set(changeColour(mapInfo.getNeighbourhood(button.getText())));
         }
 
     }

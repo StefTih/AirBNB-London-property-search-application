@@ -8,6 +8,12 @@ import javafx.event.ActionEvent;
 import java.awt.*;
 import java.util.ArrayList;
 
+/**
+ * This class represents a single StatisticBox component.
+ * It shows a single statistic and allows to navigate to other available statistics.
+ * @author Jessy Briard
+ */
+
 public class StatisticBox extends BorderPane {
 
     private View view;
@@ -20,6 +26,7 @@ public class StatisticBox extends BorderPane {
         super();
 
         this.view = view;
+        this.statistics = view.getStatistics();
 
         initialiseComponents();
 
@@ -27,6 +34,9 @@ public class StatisticBox extends BorderPane {
 
     }
 
+    /**
+     * Create the Statistic Box as a component.
+     */
     private void initialiseComponents() {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         double screenWidth = screenSize.getWidth();
@@ -58,10 +68,12 @@ public class StatisticBox extends BorderPane {
 
     }
 
-
+    /**
+     * Action to execute when the user clicks on the "<" button.
+     * The Statistic Box shows the (circularly) previous available statistic.
+     * @param event The ActionEvent triggered by the user
+     */
     private void previousStatistic(ActionEvent event) {
-        // SHOW PREVIOUS STATISTIC
-        statistics = view.getStatistics();
         statisticIndex = (statisticIndex-1+statistics.size())%(statistics.size());
         while (view.statisticUsed(this, statisticIndex)) {
             statisticIndex = (statisticIndex-1+statistics.size())%(statistics.size());
@@ -69,9 +81,12 @@ public class StatisticBox extends BorderPane {
         setStatistic();
     }
 
+    /**
+     * Action to execute when the user clicks on the ">" button.
+     * The Statistic Box shows the (circularly) next available statistic.
+     * @param event The ActionEvent triggered by the user
+     */
     private void nextStatistic(ActionEvent event) {
-        // SHOW NEXT STATISTIC
-        statistics = view.getStatistics();
         statisticIndex = (statisticIndex+1)%(statistics.size());
         while (view.statisticUsed(this, statisticIndex)) {
             statisticIndex = (statisticIndex+1)%(statistics.size());
@@ -79,19 +94,21 @@ public class StatisticBox extends BorderPane {
         setStatistic();
     }
 
-    private void setStatistic() {
+    /**
+     * Show the selected statistic on the GUI.
+     */
+    public void setStatistic() {
         Statistic stat = statistics.get(statisticIndex);
         statisticName.setText(stat.getName());
         statisticValue.setText(stat.getValue());
     }
 
+    /**
+     * Get the index of the currently shown statistic.
+     * @return The index of the currently shown statistic
+     */
     public int getStatisticIndex() {
         return statisticIndex;
-    }
-
-    public void update() {
-        statistics = view.getStatistics();
-        setStatistic();
     }
 
 }

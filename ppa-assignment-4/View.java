@@ -21,6 +21,11 @@ import javafx.scene.text.*;
 import java.awt.*;
 import java.util.*;
 
+/**
+ * This class represents the view of our London Property Marketplace Application.
+ * @author Jessy Briard, Tihomir Stefanov, Alexandru Bularca, Ravshanbek Rozukulov
+ */
+
 public class View extends Application {
 
     private AirbnbDataLoader dataLoader = new AirbnbDataLoader();
@@ -38,9 +43,18 @@ public class View extends Application {
     private Parent welcomePanel = new Label("Welcome");
     private BorderPane mapPanel;
     private GridPane statisticsPanel;
+    // The index of the current shown panel
     private int panelIndex = 0;
 
-    private ArrayList<Statistic> statistics;
+    // The statistics
+    private Statistic statAvgReviews = new Statistic("Average number of reviews per property");
+    private Statistic statNbOfProperties = new Statistic("Total number of available properties");
+    private Statistic statNbOfEntireHomeApartments = new Statistic("Number of entire homes and apartments");
+    private Statistic statMostExpensiveBorough = new Statistic("Most expensive borough");
+    // ADD 4 ADDITIONAL STATISTICS
+    private ArrayList<Statistic> statistics = new ArrayList<>(Arrays.asList(statAvgReviews, statNbOfProperties, statNbOfEntireHomeApartments, statMostExpensiveBorough, new Statistic("TEST")));
+
+    // Collection of all 4 "Statistic Boxes"
     private ArrayList<StatisticBox> statisticBoxes;
 
     //Stores an object of the array which contains all the borough names and their grid pane coordinates
@@ -55,10 +69,19 @@ public class View extends Application {
     private ArrayList<Button> propertyButtons;
 
 
+    /**
+     * Main method
+     * @param args
+     */
     public static void main(String[] args) {
         launch(args);
     }
 
+    /**
+     * Start the JavaFx Application
+     * @param primaryStage The stage of the GUI
+     * @throws Exception
+     */
     @Override
     public void start(Stage primaryStage) throws Exception{
         //Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
@@ -67,32 +90,43 @@ public class View extends Application {
 
         root = new BorderPane();
         primaryStage.setTitle("London Property Marketplace");
+        // The size of the window is adapted to the size of the screen
         primaryStage.setScene(new Scene(root, 0.8*screenSize.getWidth(), 0.8*screenSize.getHeight()));
         primaryStage.show();
 
+        //Initialising the "Application Window" in te GUI
         initialiseApplicationWindow();
 
-        //Initialising the map panel in the GUI
+        //Initialising the "Map Panel" in the GUI
         addBoroughsToMap();
         initialiseMapPanel();
 
+        //Initialising the "Statistics Panel" in the GUI
         computeStatistics();
         initialiseStatisticsPanel();
 
         centerPanels = new ArrayList<Parent>(Arrays.asList(welcomePanel, mapPanel, statisticsPanel));
-        root.setCenter(centerPanels.get(0));
+        root.setCenter(centerPanels.get(0)); // Show the first panel ("Welcome Panel") in the Application
 
     }
 
+
+
+
     // Application window methods
 
+    /**
+     * Create the JavaFX interface for the "Application Window" (to navigate between panels and select a price range).
+     */
     private void initialiseApplicationWindow() {
         BorderPane topBar = new BorderPane();
         root.setTop(topBar);
 
+        // Common parameters for HBoxes
         int hBoxSpacing = 10;
         Insets hBoxPadding = new Insets(10, 10, 10, 10);
 
+        // Create the "<" and ">" buttons to navigate between panels
         HBox navigationButtons = new HBox();
         topBar.setLeft(navigationButtons);
         navigationButtons.setSpacing(hBoxSpacing);
@@ -105,6 +139,7 @@ public class View extends Application {
         forwardButton.setDisable(true);
         navigationButtons.getChildren().addAll(backButton, forwardButton);
 
+        // Create the DropDown Lists for the user to select a property price range
         HBox priceRangeComponents = new HBox();
         topBar.setRight(priceRangeComponents);
         priceRangeComponents.setAlignment(Pos.CENTER);
@@ -112,51 +147,74 @@ public class View extends Application {
         priceRangeComponents.setPadding(hBoxPadding);
         Label fromLabel = new Label("From: ");
         Label toLabel = new Label("To: ");
-        fromComboBox = new ComboBox();
+        fromComboBox = new ComboBox(); // DropDown List for minimum price
         String[] fromItems = new String[] {
                 "0", "50", "100", "150", "200", "250", "300", "350", "400", "450", "500", "1000"};
         addItemsToComboBox(fromComboBox, fromItems);
         fromComboBox.setOnAction(this:: fromComboBoxAction);
-        toComboBox = new ComboBox();
+        toComboBox = new ComboBox(); // DropDown List for maximum price
         String[] toItems = new String[] {"50", "100", "150", "200", "250", "300", "350", "400", "450", "500", "1000", "10000"};
         addItemsToComboBox(toComboBox, toItems);
         toComboBox.setOnAction(this:: toComboBoxAction);
         priceRangeComponents.getChildren().addAll(fromLabel, fromComboBox, toLabel, toComboBox);
     }
 
+    /**
+     * Action to execute when the user interacts with the minimum price DropDown List.
+     * Adapt the information shown by the Application according to the selected price range.
+     * @param event The Event triggered by the user
+     */
     private void fromComboBoxAction(Event event) {
-        Object item = fromComboBox.getSelectionModel().getSelectedItem();
+        Object item = fromComboBox.getSelectionModel().getSelectedItem(); // Price selected by the user
         if (item != null) {
             fromPrice = Integer.parseInt(item.toString());
         } else {
             fromPrice = null;
         }
-        enableButtons();
-        computeProperties();
+        boolean invalidRange = invalidPriceRange();
+        enableButtons(invalidRange); // Enable or Disable the navigation between panels depending on the validity of the selected price range
+        if (! invalidRange) {
+            computeProperties(); // Collect the proprieties that correspond to the selected price range
+        }
     }
 
+    /**
+     * Action to execute when the user interacts with the minimum price DropDown List.
+     * Adapt the information shown by the Application according to the selected price range.
+     * @param event The Event triggered by the user
+     */
     private void toComboBoxAction(Event event) {
-        Object item = toComboBox.getSelectionModel().getSelectedItem();
+        Object item = toComboBox.getSelectionModel().getSelectedItem(); // Price selected by the user
         if (item != null) {
             toPrice = Integer.parseInt(item.toString());
         } else {
             toPrice = null;
         }
-        enableButtons();
-        computeProperties();
+        boolean invalidRange = invalidPriceRange();
+        enableButtons(invalidRange); // Enable or Disable the navigation between panels depending on the validity of the selected price range
+        if (! invalidRange) {
+            computeProperties(); // Collect the proprieties that correspond to the selected price range
+        }
     }
 
-    private void enableButtons()
+    /**
+     * Enable or Disable the "<" and ">" buttons to navigate between panels, depending on the validity of the price range selected by the user.
+     * @param invalidRange Whether the price range selected by the user is invalid
+     */
+    private void enableButtons(boolean invalidRange)
     {
-        boolean invalidRange = invalidPriceRange();
         backButton.setDisable(invalidRange);
         forwardButton.setDisable(invalidRange);
     }
 
+    /**
+     * Whether the price range selected by the user is invalid.
+     * @return true if the selected price range is invalid, else (it is valid) return false
+     */
     private boolean invalidPriceRange() {
-        if (fromPrice != null && toPrice != null) {
-            //If the price range is invalid
-            if (toPrice-fromPrice < 0) {
+        if (fromPrice != null && toPrice != null) { // If both boundaries are selected
+            if (toPrice-fromPrice < 0) { //If the price range is invalid
+                // Show an Alert Dialog
                 Alert invalidPriceRangeAlert = new Alert(Alert.AlertType.WARNING);
                 invalidPriceRangeAlert.setTitle("Price range is invalid");
                 invalidPriceRangeAlert.setHeaderText("The selected price range is invalid.");
@@ -164,21 +222,37 @@ public class View extends Application {
                 invalidPriceRangeAlert.showAndWait();
             }
         }
+        // Return whether the selected price range is invalid
         return (fromPrice == null || toPrice == null || (toPrice-fromPrice) < 0);
     }
 
 
+    /**
+     * Action to execute when the user clicks on the "<" button.
+     * The Application shows the previous panel.
+     * @param event The ActionEvent triggered by the user
+     */
     private void backButtonAction(ActionEvent event) {
-        panelIndex = (panelIndex-1+centerPanels.size())%(centerPanels.size());
+        panelIndex = (panelIndex-1+centerPanels.size())%(centerPanels.size()); // Index of previous panel
         root.setCenter(centerPanels.get(panelIndex));
     }
 
+    /**
+     * Action to execute when the user clicks on the ">" button.
+     * The Application shows the next panel.
+     * @param event The ActionEvent triggered by the user
+     */
     private void forwardButtonAction(ActionEvent event) {
-        panelIndex = (panelIndex+1)%(centerPanels.size());
+        panelIndex = (panelIndex+1)%(centerPanels.size()); // Index of next panel
         root.setCenter(centerPanels.get(panelIndex));
     }
 
 
+    /**
+     * Add all items from an array into a ComboBox
+     * @param comboBox The ComboBox to add the items into
+     * @param items The array of items to add to the ComboBox
+     */
     private void addItemsToComboBox(ComboBox comboBox, String[] items)
     {
         for (String item: items) {
@@ -186,7 +260,13 @@ public class View extends Application {
         }
     }
 
+
+
+
     //Welcome window methods
+
+
+
 
     //Map window methods
 
@@ -496,67 +576,65 @@ public class View extends Application {
         return mapInfo.propertyVolumeColour(neighbourhood);
     }
 
+
+
     //Statistics window methods
 
+    /**
+     * Collect the properties that correspond to the price range selected by the user, into an ArrayList.
+     * Only called if the selected price range is valid.
+     */
     private void computeProperties() {
-        if (! invalidPriceRange()) {
-            properties = dataLoader.load();
+        properties = dataLoader.load();
 
-            properties.removeIf(p -> (p.getPrice() < fromPrice || p.getPrice() > toPrice));
+        // We only keep the properties that fit in the price range
+        properties.removeIf(p -> (p.getPrice() < fromPrice || p.getPrice() > toPrice));
 
-            computeStatistics();
+        computeStatistics(); // Compute the statistics according to the current list of properties
 
-            updateStatistics();
+        updateStatistics(); // Update the value statistic shown in each "Statistic Box"
 
-            //Updates the details regarding the map panel
-            mapInfo.setPropertyData(properties);
+        //Updates the details regarding the map panel
+        mapInfo.setPropertyData(properties);
 
-            setColour(mapButtons);
-
-            int maxPrice = 0;
-        }
+        setColour(mapButtons);
     }
 
-
+    /**
+     * Compute the statistics according to the current list of properties (depending on selected price range).
+     */
     private void computeStatistics() {
-        statistics = new ArrayList<>();
-
         // Compute number of reviews
-        String statName = "Average number of reviews per property";
         if (properties.isEmpty()) {
-            statistics.add(new Statistic(statName, "-"));
+            statAvgReviews.setValue("-");
         } else {
             double count = 0;
             for (AirbnbListing property : properties) {
                 count += property.getNumberOfReviews();
             }
-            statistics.add(new Statistic(statName, String.valueOf(count/properties.size())));
+            statAvgReviews.setValue(String.valueOf(count/properties.size()));
         }
 
         // Compute number of available properties
-        statName = "Total number of available properties";
-        statistics.add(new Statistic(statName, String.valueOf(properties.size())));
+        statNbOfProperties.setValue(String.valueOf(properties.size()));
 
         // Compute number of entire homes and apartments
-        statName = "Number of entire homes and apartments";
-        statistics.add(new Statistic(statName,
+        statNbOfEntireHomeApartments.setValue(
             String.valueOf(properties.stream().filter(p -> (p.getRoom_type().equals("Entire home/apt"))).count())
-        ));
+        );
 
         // Compute most expensive borough
-        statName = "Most expensive borough";
-        // TO CHANGE
-        statistics.add(new Statistic(statName, mostExpensiveBorough()));
+        statMostExpensiveBorough.setValue(mostExpensiveBorough());
 
-        // TEST TO REMOVE
-        statistics.add(new Statistic("Test", "Test Value"));
-
-        // ADD 4 STATS
+        // ADD 4 ADDITIONAL STATS
 
     }
 
-
+    /**
+     * Create the JavaFX interface for the "Statistics Panel" (show interactive statistic boxes).
+     */
     private void initialiseStatisticsPanel() {
+        // Create the panel as a 2x2 grid
         statisticsPanel = new GridPane();
         statisticsPanel.setPadding(new Insets(10,10,10,10));
         statisticsPanel.setHgap(50);
@@ -570,7 +648,7 @@ public class View extends Application {
         statisticsPanel.getRowConstraints().add(rowConstraints);
         statisticsPanel.getRowConstraints().add(rowConstraints);
 
-
+        // Create the 4 custom "Statistic Boxes"
         statisticBoxes = new ArrayList<>();
         StatisticBox statisticBox1 = new StatisticBox(this);
         statisticsPanel.add(statisticBox1, 0, 0);
@@ -607,7 +685,7 @@ public class View extends Application {
             }
         }
 
-        // Find borough with largest average property price
+        // Find borough with the largest average property price
         String mostExpensiveBorough = null;
         double largestAveragePropertyPrice = 0;
         Enumeration<String> boroughsEnum = boroughPrices.keys();
@@ -629,14 +707,26 @@ public class View extends Application {
             }
         }
 
+        // Return the name of the most expensive borough
         return mostExpensiveBorough;
 
     }
 
+    /**
+     * Get the current statistics as an ArrayList.
+     * @return The ArrayList of the current statistics
+     */
     public ArrayList<Statistic> getStatistics() {
         return statistics;
     }
 
+    /**
+     * Whether a statistic is already shown by another Statistic Box.
+     * (2 Statistic Boxes cannot simultaneously show the same statistic)
+     * @param statisticBox The requesting Statistic Box
+     * @param index The index of the request statistic to show
+     * @return true if the statistic is shown by another Statistic Box, else (statistic not shown) returns false
+     */
     public boolean statisticUsed(StatisticBox statisticBox, int index) {
         for (StatisticBox box: statisticBoxes) {
             if (box != statisticBox && box.getStatisticIndex() == index) {
@@ -646,9 +736,12 @@ public class View extends Application {
         return false;
     }
 
+    /**
+     * Update the value of the statistic show in each "Statistic Box".
+     */
     private void updateStatistics() {
         for (StatisticBox box: statisticBoxes) {
-            box.update();
+            box.setStatistic();
         }
     }
 

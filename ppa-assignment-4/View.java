@@ -20,6 +20,7 @@ import javafx.scene.text.*;
 
 import java.awt.*;
 import java.util.*;
+import java.util.concurrent.Flow;
 
 /**
  * This class represents the view of our London Property Marketplace Application.
@@ -45,6 +46,9 @@ public class View extends Application {
     private GridPane statisticsPanel;
     // The index of the current shown panel
     private int panelIndex = 0;
+
+    // The welcome page
+    private Label welcomePriceLabel;
 
     // The statistics
     private Statistic statAvgReviews = new Statistic("Average number of reviews per property");
@@ -91,7 +95,10 @@ public class View extends Application {
         root = new BorderPane();
         primaryStage.setTitle("London Property Marketplace");
         // The size of the window is adapted to the size of the screen
-        primaryStage.setScene(new Scene(root, 0.8*screenSize.getWidth(), 0.8*screenSize.getHeight()));
+
+        Scene primaryScene = new Scene(root, 0.8*screenSize.getWidth(), 0.8*screenSize.getHeight());
+        primaryScene.getStylesheets().addAll("main.css");
+        primaryStage.setScene(primaryScene);
         primaryStage.show();
 
         //Initialising the "Application Window" in the GUI
@@ -179,6 +186,7 @@ public class View extends Application {
         if (! invalidRange) {
             computeProperties(); // Collect the proprieties that correspond to the selected price range
         }
+        showPriceRange(invalidRange);
     }
 
     /**
@@ -198,6 +206,7 @@ public class View extends Application {
         if (! invalidRange) {
             computeProperties(); // Collect the proprieties that correspond to the selected price range
         }
+        showPriceRange(invalidRange);
     }
 
     /**
@@ -270,31 +279,65 @@ public class View extends Application {
     //Welcome window methods
     private void initialiseWelcomePanel()
     {
-        Insets welcomeInsets = new Insets(5, 2, 5, 2);
+        Insets welcomeInsets = new Insets(200, 30, 30, 30);
 
         welcomePanel = new BorderPane();
-        welcomePanel.setPadding(welcomeInsets);
+        welcomePanel.setId("welcome-panel");
 
         VBox welcomeCenter = new VBox();
-        welcomeCenter.setSpacing(5);
-        welcomeCenter.setPadding(welcomeInsets);
+        welcomeCenter.setPadding(new Insets(150, 20, 20, 20));
+        welcomeCenter.setSpacing(20);
+
+        //welcomeCenter.setPrefWidth(2000);
+
+        Pane leftFlow = new VBox();
+        leftFlow.getStyleClass().add("welcome-sides");
+        leftFlow.setPadding(welcomeInsets);
+        Pane rightFlow = new VBox();
+        rightFlow.getStyleClass().add("welcome-sides");
+        rightFlow.setPadding(welcomeInsets);
 
         Label welcomeTitleLabel = new Label("Welcome to London Property Marketplace");
+        welcomeTitleLabel.setId("welcome-title-label");
+        welcomeTitleLabel.setWrapText(true);
+
         Label welcomeInfoLabel = new Label("This application shows information about all available airbnb properties in every london borough based on the given price range.");
+        welcomeInfoLabel.setWrapText(true);
+
         Label welcomeHowToLabel = new Label("How to use:");
+        welcomeHowToLabel.setWrapText(true);
+
         Label welcomeInstructionsLabel = new Label("Select a preferred price range. Click on a borough on the borough map to see its listings. Click on a property to view its details. Go to the statistics page to view the statistics of listings in the selected price range");
+        welcomeInstructionsLabel.setWrapText(true);
 
-        Label welcomeArrowsLabel = new Label("Using the arrow keys in the top left corner you can traverse through the following pages in the app: \n1. Welcome page \n2. Map of boroughs with their listings \n3. Statistics on the current price range");
+        Label welcomeArrowsLabel = new Label("Using the arrow keys in the top left corner you can traverse through the following pages in the app: \n\n1. Welcome page \n2. Map of boroughs with their listings \n3. Statistics on the current price range");
+        welcomeArrowsLabel.setWrapText(true);
+
         Label welcomeFilterLabel = new Label("To select a price range use the boxes in the top right corner");
+        welcomeFilterLabel.setWrapText(true);
 
+        Label welcomePriceTitleLabel = new Label("Selected price range:");
 
-        Label welcomePriceLabel = new Label("No price range selected");
+        welcomePriceLabel = new Label("No price range selected");
 
-        welcomePanel.getChildren().addAll(welcomeTitleLabel, welcomeInfoLabel, welcomeHowToLabel, welcomeInstructionsLabel, welcomePriceLabel);
+        welcomeCenter.getChildren().addAll(welcomeTitleLabel, welcomeInfoLabel, welcomeHowToLabel, welcomeInstructionsLabel, welcomePriceTitleLabel, welcomePriceLabel);
+
+        leftFlow.getChildren().addAll(welcomeArrowsLabel);
+        rightFlow.getChildren().addAll(welcomeFilterLabel);
 
         welcomePanel.setCenter(welcomeCenter);
-        welcomePanel.setLeft(welcomeArrowsLabel);
-        welcomePanel.setRight(welcomeFilterLabel);
+        welcomePanel.setLeft(leftFlow);
+        welcomePanel.setRight(rightFlow);
+    }
+
+    private void showPriceRange(boolean invalid)
+    {
+        if(invalid && fromPrice != null && toPrice != null){
+            welcomePriceLabel.setText("Invalid");
+        }
+        else if(fromPrice != null && toPrice != null){
+            welcomePriceLabel.setText("\u00A3" + fromPrice + " - \u00A3" + toPrice);
+        }
     }
 
 

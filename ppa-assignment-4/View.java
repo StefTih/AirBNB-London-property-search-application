@@ -393,6 +393,7 @@ public class View extends Application {
     {
 
         mapPanel = new BorderPane();
+        mapPanel.setId("map-panel");
         //Create a top label with a message in it
         Label top = new Label("This the map of all the London boroughs and a relative " +
                 "comparison to number of available properties in each borough");
@@ -449,6 +450,7 @@ public class View extends Application {
     private GridPane createMap()
     {
         GridPane boroughMap = new GridPane();
+        boroughMap.setId("map-grid");
         Integer xCoordinate;
         Integer yCoordinate;
 

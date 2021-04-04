@@ -1,0 +1,32 @@
+#welcome-panel{
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 30;
+    -fx-font-family: "Arial";
+}
+
+#welcome-center{
+    -fx-border-radius: 20;
+}
+
+#welcome-title-label{
+    -fx-font-size: 25;
+}
+
+.welcome-sides{
+    -fx-pref-width: 250;
+    -fx-font-size: 15;
+    -fx-text-fill: #4997eb;
+
+}
+
+.welcome-label{
+    -fx-label-padding: 25;
+}
+
+#welcome-paragraph{
+    -fx-border-color: #4997eb;
+    -fx-border-radius: 5;
+    -fx-border-width: 3;
+    -fx-font-size: 18;
+    -fx-text-fill: #000000;
+}

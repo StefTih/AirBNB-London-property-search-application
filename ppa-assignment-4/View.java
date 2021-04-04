@@ -40,7 +40,7 @@ public class View extends Application {
     private Integer toPrice;
 
     private ArrayList<Parent> centerPanels;
-    private Parent welcomePanel = new Label("Welcome");
+    private BorderPane welcomePanel;
     private BorderPane mapPanel;
     private GridPane statisticsPanel;
     // The index of the current shown panel
@@ -94,8 +94,11 @@ public class View extends Application {
         primaryStage.setScene(new Scene(root, 0.8*screenSize.getWidth(), 0.8*screenSize.getHeight()));
         primaryStage.show();
 
-        //Initialising the "Application Window" in te GUI
+        //Initialising the "Application Window" in the GUI
         initialiseApplicationWindow();
+
+        //Initialising the "Welcome Panel" in the GUI
+        initialiseWelcomePanel();
 
         //Initialising the "Map Panel" in the GUI
         addBoroughsToMap();
@@ -198,7 +201,8 @@ public class View extends Application {
     }
 
     /**
-     * Enable or Disable the "<" and ">" buttons to navigate between panels, depending on the validity of the price range selected by the user.
+     * Enable or Disable the "<" and ">" buttons to navigate between panels,
+     * depending on the validity of the price range selected by the user.
      * @param invalidRange Whether the price range selected by the user is invalid
      */
     private void enableButtons(boolean invalidRange)
@@ -264,7 +268,34 @@ public class View extends Application {
 
 
     //Welcome window methods
+    private void initialiseWelcomePanel()
+    {
+        Insets welcomeInsets = new Insets(5, 2, 5, 2);
 
+        welcomePanel = new BorderPane();
+        welcomePanel.setPadding(welcomeInsets);
+
+        VBox welcomeCenter = new VBox();
+        welcomeCenter.setSpacing(5);
+        welcomeCenter.setPadding(welcomeInsets);
+
+        Label welcomeTitleLabel = new Label("Welcome to London Property Marketplace");
+        Label welcomeInfoLabel = new Label("This application shows information about all available airbnb properties in every london borough based on the given price range.");
+        Label welcomeHowToLabel = new Label("How to use:");
+        Label welcomeInstructionsLabel = new Label("Select a preferred price range. Click on a borough on the borough map to see its listings. Click on a property to view its details. Go to the statistics page to view the statistics of listings in the selected price range");
+
+        Label welcomeArrowsLabel = new Label("Using the arrow keys in the top left corner you can traverse through the following pages in the app: \n1. Welcome page \n2. Map of boroughs with their listings \n3. Statistics on the current price range");
+        Label welcomeFilterLabel = new Label("To select a price range use the boxes in the top right corner");
+
+
+        Label welcomePriceLabel = new Label("No price range selected");
+
+        welcomePanel.getChildren().addAll(welcomeTitleLabel, welcomeInfoLabel, welcomeHowToLabel, welcomeInstructionsLabel, welcomePriceLabel);
+
+        welcomePanel.setCenter(welcomeCenter);
+        welcomePanel.setLeft(welcomeArrowsLabel);
+        welcomePanel.setRight(welcomeFilterLabel);
+    }
 
 
 

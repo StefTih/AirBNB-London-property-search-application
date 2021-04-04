@@ -18,11 +18,11 @@ public class MapInfo {
     // Then boundary for number of properties available going from the mid to high boundary
     private static final int MID_HIGH_BOUNDARY = 2000;
     //Colour for low volume number of properties
-    private static final String LOW_VOL = "-fx-background-color:#FFCCCB";
+    private static final String LOW_VOL = "-fx-background-color:#fab1a0";
     //Colour for medium volume number of properties
-    private static final String MED_VOL = "-fx-background-color:#FFFF00";
+    private static final String MED_VOL = "-fx-background-color:#ffeaa7";
     //Colour for low high volume number of properties
-    private static final String HIGH_VOL = "-fx-background-color:#00FF00";
+    private static final String HIGH_VOL = "-fx-background-color:#55efc4";
 
     //The boroughs of London and their corresponding coordinates in the map.
     private String[][] LondonBoroughs;

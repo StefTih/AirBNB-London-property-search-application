@@ -30,3 +30,19 @@
     -fx-font-size: 18;
     -fx-text-fill: #000000;
 }
+
+#map-panel{
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 50;
+}
+
+#map-grid .button{
+    -fx-border-color: rgba(1, 161, 254, 0);
+    -fx-border-width: 3;
+    -fx-border-radius: 2;
+}
+
+#map-grid .button:hover{
+    -fx-border-color: rgba(1, 161, 254, 1);
+}
+

@@ -281,37 +281,12 @@ public class View extends Application {
     //Welcome window methods
     private void initialiseWelcomePanel()
     {
-        Insets welcomeInsets = new Insets(200, 30, 30, 30);
-
         welcomePanel = new BorderPane();
         welcomePanel.setId("welcome-panel");
-
-        VBox welcomeCenter = new VBox();
-        welcomeCenter.setId("welcome-center");
-        //welcomeCenter.setPadding(new Insets(150, 20, 20, 20));
-        //welcomeCenter.setSpacing(20);
-
-        //welcomeCenter.setPrefWidth(2000);
-
-        Pane leftFlow = new VBox();
-        leftFlow.getStyleClass().add("welcome-sides");
-        //leftFlow.setPadding(welcomeInsets);
-        Pane rightFlow = new VBox();
-        rightFlow.getStyleClass().add("welcome-sides");
-        //rightFlow.setPadding(welcomeInsets);
 
         Label welcomeTitleLabel = new Label("Welcome to London Property Marketplace");
         welcomeTitleLabel.setId("welcome-title-label");
         welcomeTitleLabel.setWrapText(true);
-
-        Label welcomeInfoLabel = new Label("This application shows information about all available airbnb properties in every london borough based on the given price range.");
-        welcomeInfoLabel.setWrapText(true);
-
-        Label welcomeHowToLabel = new Label("How to use:");
-        welcomeHowToLabel.setWrapText(true);
-
-        Label welcomeInstructionsLabel = new Label("Select a preferred price range. Click on a borough on the borough map to see its listings. Click on a property to view its details. Go to the statistics page to view the statistics of listings in the selected price range");
-        welcomeInstructionsLabel.setWrapText(true);
 
         Label welcomeArrowsLabel = new Label("Using the arrow keys in the top left corner you can traverse through the following pages in the app: \n\n1. Welcome page \n2. Map of boroughs with their listings \n3. Statistics on the current price range");
         welcomeArrowsLabel.setWrapText(true);
@@ -324,17 +299,6 @@ public class View extends Application {
         welcomeFilterLabel.getStyleClass().add("welcome-sides");
         welcomeFilterLabel.getStyleClass().add("welcome-label");
 
-        Label welcomePriceTitleLabel = new Label("Selected price range:");
-
-        welcomePriceLabel = new Label("No price range selected");
-
-        //welcomeCenter.getChildren().addAll(welcomeTitleLabel, welcomeInfoLabel, welcomeHowToLabel, welcomeInstructionsLabel, welcomePriceTitleLabel, welcomePriceLabel);
-
-        //leftFlow.getChildren().addAll(welcomeArrowsLabel);
-        //rightFlow.getChildren().addAll(welcomeFilterLabel);
-
-        //BorderPane.setAlignment(welcomeCenter, Pos.CENTER);
-        //welcomePanel.setCenter(welcomeCenter);
 
         welcomeText = new Label(welcomeParagraph + "No price range selected");
         welcomeText.setWrapText(true);

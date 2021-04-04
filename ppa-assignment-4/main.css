@@ -1,7 +1,7 @@
 #welcome-panel{
     -fx-background-color: #FFFFFF;
     -fx-padding: 30;
-    -fx-font-family: "Helvetica";
+    -fx-font-family: "Arial";
 }
 
 #welcome-center{
@@ -15,7 +15,7 @@
 .welcome-sides{
     -fx-pref-width: 250;
     -fx-font-size: 15;
-    -fx-text-fill: #6cbbf1;
+    -fx-text-fill: #4997eb;
 
 }
 
@@ -24,7 +24,7 @@
 }
 
 #welcome-paragraph{
-    -fx-border-color: #6cbbf1;
+    -fx-border-color: #4997eb;
     -fx-border-radius: 5;
     -fx-border-width: 3;
     -fx-font-size: 18;

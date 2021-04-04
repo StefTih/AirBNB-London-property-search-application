@@ -1,5 +1,4 @@
 #welcome-panel{
-    -fx-alignment: bottom;
     -fx-background-color: #FFFFFF;
     -fx-padding: 30;
     -fx-font-family: "Helvetica";
@@ -9,18 +8,25 @@
     -fx-border-radius: 20;
 }
 
-#welcome-panel .label{
-    -fx-text-fill: #000000;
-}
-
 #welcome-title-label{
     -fx-font-size: 25;
 }
 
 .welcome-sides{
-    -fx-border-insets: 200, 0, 0, 0;
     -fx-pref-width: 250;
-    -fx-spacing: 20;
-    -fx-font-size: 12;
+    -fx-font-size: 15;
+    -fx-text-fill: #6cbbf1;
 
+}
+
+.welcome-label{
+    -fx-label-padding: 25;
+}
+
+#welcome-paragraph{
+    -fx-border-color: #6cbbf1;
+    -fx-border-radius: 5;
+    -fx-border-width: 3;
+    -fx-font-size: 18;
+    -fx-text-fill: #000000;
 }

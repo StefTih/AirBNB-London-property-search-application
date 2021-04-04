@@ -285,17 +285,18 @@ public class View extends Application {
         welcomePanel.setId("welcome-panel");
 
         VBox welcomeCenter = new VBox();
-        welcomeCenter.setPadding(new Insets(150, 20, 20, 20));
+        welcomeCenter.setId("welcome-center");
+        //welcomeCenter.setPadding(new Insets(150, 20, 20, 20));
         welcomeCenter.setSpacing(20);
 
         //welcomeCenter.setPrefWidth(2000);
 
         Pane leftFlow = new VBox();
         leftFlow.getStyleClass().add("welcome-sides");
-        leftFlow.setPadding(welcomeInsets);
+        //leftFlow.setPadding(welcomeInsets);
         Pane rightFlow = new VBox();
         rightFlow.getStyleClass().add("welcome-sides");
-        rightFlow.setPadding(welcomeInsets);
+        //rightFlow.setPadding(welcomeInsets);
 
         Label welcomeTitleLabel = new Label("Welcome to London Property Marketplace");
         welcomeTitleLabel.setId("welcome-title-label");
@@ -320,14 +321,29 @@ public class View extends Application {
 
         welcomePriceLabel = new Label("No price range selected");
 
-        welcomeCenter.getChildren().addAll(welcomeTitleLabel, welcomeInfoLabel, welcomeHowToLabel, welcomeInstructionsLabel, welcomePriceTitleLabel, welcomePriceLabel);
+        //welcomeCenter.getChildren().addAll(welcomeTitleLabel, welcomeInfoLabel, welcomeHowToLabel, welcomeInstructionsLabel, welcomePriceTitleLabel, welcomePriceLabel);
 
-        leftFlow.getChildren().addAll(welcomeArrowsLabel);
-        rightFlow.getChildren().addAll(welcomeFilterLabel);
+        //leftFlow.getChildren().addAll(welcomeArrowsLabel);
+        //rightFlow.getChildren().addAll(welcomeFilterLabel);
 
-        welcomePanel.setCenter(welcomeCenter);
-        welcomePanel.setLeft(leftFlow);
-        welcomePanel.setRight(rightFlow);
+        //BorderPane.setAlignment(welcomeCenter, Pos.CENTER);
+        //welcomePanel.setCenter(welcomeCenter);
+
+        Label hugeLabel = new Label(welcomeInfoLabel.getText() + "\n\n" + welcomeHowToLabel.getText() + "\n\n" + welcomeInstructionsLabel.getText() + "\n\n" + welcomePriceTitleLabel.getText() + "\n" + welcomePriceLabel.getText());
+        hugeLabel.setWrapText(true);
+
+        BorderPane.setAlignment(welcomeTitleLabel, Pos.CENTER);
+        welcomePanel.setTop(welcomeTitleLabel);
+
+        BorderPane.setAlignment(hugeLabel, Pos.CENTER);
+        welcomePanel.setCenter(hugeLabel);
+
+        BorderPane.setAlignment(welcomeArrowsLabel, Pos.CENTER);
+        welcomePanel.setLeft(welcomeArrowsLabel);
+
+        BorderPane.setAlignment(welcomeFilterLabel, Pos.CENTER);
+        welcomePanel.setRight(welcomeFilterLabel);
+
     }
 
     private void showPriceRange(boolean invalid)

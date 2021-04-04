@@ -51,8 +51,12 @@ public class View extends Application {
     private Statistic statNbOfProperties = new Statistic("Total number of available properties");
     private Statistic statNbOfEntireHomeApartments = new Statistic("Number of entire homes and apartments");
     private Statistic statMostExpensiveBorough = new Statistic("Most expensive borough");
-    // ADD 4 ADDITIONAL STATISTICS
-    private ArrayList<Statistic> statistics = new ArrayList<>(Arrays.asList(statAvgReviews, statNbOfProperties, statNbOfEntireHomeApartments, statMostExpensiveBorough, new Statistic("TEST")));
+    private Statistic statAvgPriceViewedProperties = new Statistic("Average price of all viewed properties");
+    // ADD 3 ADDITIONAL STATISTICS
+    private ArrayList<Statistic> statistics = new ArrayList<>(Arrays.asList(statAvgReviews, statNbOfProperties, statNbOfEntireHomeApartments, statMostExpensiveBorough, statAvgPriceViewedProperties));
+
+    // Collection of viewed properties
+    private HashMap<String, AirbnbListing> viewedProperties = new HashMap<>();
 
     // Collection of all 4 "Statistic Boxes"
     private ArrayList<StatisticBox> statisticBoxes;
@@ -102,8 +106,8 @@ public class View extends Application {
         initialiseMapPanel();
 
         //Initialising the "Statistics Panel" in the GUI
-        computeStatistics();
         initialiseStatisticsPanel();
+        computeStatistics();
 
         centerPanels = new ArrayList<Parent>(Arrays.asList(welcomePanel, mapPanel, statisticsPanel));
         root.setCenter(centerPanels.get(0)); // Show the first panel ("Welcome Panel") in the Application
@@ -122,14 +126,13 @@ public class View extends Application {
         BorderPane topBar = new BorderPane();
         root.setTop(topBar);
 
-        // Common parameters for HBoxes
-        int hBoxSpacing = 10;
+        // Common padding parameter for HBoxes
         Insets hBoxPadding = new Insets(10, 10, 10, 10);
 
         // Create the "<" and ">" buttons to navigate between panels
         HBox navigationButtons = new HBox();
         topBar.setLeft(navigationButtons);
-        navigationButtons.setSpacing(hBoxSpacing);
+        navigationButtons.setSpacing(10);
         navigationButtons.setPadding(hBoxPadding);
         backButton = new Button("<");
         backButton.setOnAction(this:: backButtonAction);
@@ -143,10 +146,10 @@ public class View extends Application {
         HBox priceRangeComponents = new HBox();
         topBar.setRight(priceRangeComponents);
         priceRangeComponents.setAlignment(Pos.CENTER);
-        priceRangeComponents.setSpacing(hBoxSpacing);
+        priceRangeComponents.setSpacing(5);
         priceRangeComponents.setPadding(hBoxPadding);
-        Label fromLabel = new Label("From: ");
-        Label toLabel = new Label("To: ");
+        Label fromLabel = new Label("From:   \u00A3");
+        Label toLabel = new Label("To:   \u00A3");
         fromComboBox = new ComboBox(); // DropDown List for minimum price
         String[] fromItems = new String[] {
                 "0", "50", "100", "150", "200", "250", "300", "350", "400", "450", "500", "1000"};
@@ -533,7 +536,7 @@ public class View extends Application {
                     +"\nMinimum number of nights that someone can stay: "+propertyInfo.getMinimumNights());
             property.setPadding(vBoxPadding);
             propertyButtons.add(property);
-            property.setOnAction(p ->showDescription(propertyInfo.getId()));
+            property.setOnAction(p ->showDescription(propertyInfo));
         }
 
         vBox.getChildren().addAll(propertyButtons);
@@ -542,12 +545,15 @@ public class View extends Application {
 
     /**
      * This method shows the description of each property on the right side of the border pane
-     * @param propertyID holds the id of the property as a string
+     * @param property holds the property as an instance of AirbnbListing
      */
-    private void showDescription(String propertyID)
+    private void showDescription(AirbnbListing property)
     {
-        Label propertyDescription = new Label(mapInfo.showPropertyDescription(propertyID));
+        Label propertyDescription = new Label(mapInfo.showPropertyDescription(property.getId()));
         root2.setRight(propertyDescription);
+
+        viewedProperties.put(property.getId(), property);
+        computeStatistics();
     }
 
     /**
@@ -592,42 +598,10 @@ public class View extends Application {
 
         computeStatistics(); // Compute the statistics according to the current list of properties
 
-        updateStatistics(); // Update the value statistic shown in each "Statistic Box"
-
         //Updates the details regarding the map panel
         mapInfo.setPropertyData(properties);
 
         setColour(mapButtons);
-    }
-
-    /**
-     * Compute the statistics according to the current list of properties (depending on selected price range).
-     */
-    private void computeStatistics() {
-        // Compute number of reviews
-        if (properties.isEmpty()) {
-            statAvgReviews.setValue("-");
-        } else {
-            double count = 0;
-            for (AirbnbListing property : properties) {
-                count += property.getNumberOfReviews();
-            }
-            statAvgReviews.setValue(String.valueOf(count/properties.size()));
-        }
-
-        // Compute number of available properties
-        statNbOfProperties.setValue(String.valueOf(properties.size()));
-
-        // Compute number of entire homes and apartments
-        statNbOfEntireHomeApartments.setValue(
-            String.valueOf(properties.stream().filter(p -> (p.getRoom_type().equals("Entire home/apt"))).count())
-        );
-
-        // Compute most expensive borough
-        statMostExpensiveBorough.setValue(mostExpensiveBorough());
-
-        // ADD 4 ADDITIONAL STATS
-
     }
 
     /**
@@ -662,6 +636,46 @@ public class View extends Application {
         StatisticBox statisticBox4 = new StatisticBox(this);
         statisticsPanel.add(statisticBox4, 1, 1);
         statisticBoxes.add(statisticBox4);
+
+    }
+
+    /**
+     * Compute the statistics according to the current list of properties (depending on selected price range).
+     */
+    private void computeStatistics() {
+        // Compute number of reviews
+        if (properties.isEmpty()) {
+            statAvgReviews.setValue(null);
+        } else {
+            double count = 0;
+            for (AirbnbListing property : properties) {
+                count += property.getNumberOfReviews();
+            }
+            statAvgReviews.setValue(String.valueOf(count/properties.size()));
+        }
+
+        // Compute number of available properties
+        statNbOfProperties.setValue(String.valueOf(properties.size()));
+
+        // Compute number of entire homes and apartments
+        statNbOfEntireHomeApartments.setValue(
+            String.valueOf(properties.stream().filter(p -> (p.getRoom_type().equals("Entire home/apt"))).count())
+        );
+
+        // Compute most expensive borough
+        statMostExpensiveBorough.setValue(mostExpensiveBorough());
+
+        // Compute average price of viewed properties
+        if (viewedProperties.isEmpty()) {
+            statAvgPriceViewedProperties.setValue(null);
+        } else {
+            statAvgPriceViewedProperties.setValue(
+                    "\u00A3" + String.valueOf(viewedProperties.values().stream().map(property -> property.getPrice()).reduce(0, (count, price) -> count + price) / viewedProperties.size())
+            );
+        }
+
+
+        updateStatistics(); // Update the statistic value shown in each "Statistic Box"
 
     }
 
@@ -737,7 +751,7 @@ public class View extends Application {
     }
 
     /**
-     * Update the value of the statistic show in each "Statistic Box".
+     * Update the value of the statistic shown in each "Statistic Box".
      */
     private void updateStatistics() {
         for (StatisticBox box: statisticBoxes) {

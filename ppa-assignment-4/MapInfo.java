@@ -266,7 +266,7 @@ public class MapInfo {
         {
             if(property.getId().equals(propertyID))
             {
-                description = "Host name:"+property.getHost_name()
+                description = "Host name: "+property.getHost_name()
                         +"\nProperty name: "+property.getName()
                         +"\nMinimum nights: "+property.getMinimumNights()
                         +"\nPropertyID: "+property.getId()

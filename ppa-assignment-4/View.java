@@ -42,6 +42,7 @@ public class View extends Application {
     private ArrayList<AirbnbListing> properties = dataLoader.load();
 
     private BorderPane root;
+    private BorderPane topBar;
     private Button backButton;
     private Button forwardButton;
     private ComboBox fromComboBox;
@@ -51,6 +52,7 @@ public class View extends Application {
     private Label panelName;
 
     private ArrayList<Parent> centerPanels;
+    private ArrayList<NamedPanel> namedPanels;
     private BorderPane welcomePanel;
     private BorderPane mapPanel;
     private SplitPane searchEnginePanel;
@@ -58,7 +60,7 @@ public class View extends Application {
     // The index of the current shown panel
     private int panelIndex = 0;
     // Collection of the names of the center panels
-    private HashMap<Parent, String> panelNames = new HashMap<>();
+    //private HashMap<Parent, Label> panelNames = new HashMap<>();
 
     // The welcome page
     private String welcomeParagraph = "This application shows information about all available airbnb properties in every london borough based on the given price range." +
@@ -117,6 +119,7 @@ public class View extends Application {
      */
     @Override
     public void start(Stage primaryStage) throws Exception{
+
         //Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -148,13 +151,12 @@ public class View extends Application {
         initialiseSearchEnginePanel();
 
         centerPanels = new ArrayList<Parent>(Arrays.asList(welcomePanel, mapPanel, statisticsPanel, searchEnginePanel));
-        root.setCenter(centerPanels.get(0)); // Show the first panel ("Welcome Panel") in the Application
-
-        panelNames.put(welcomePanel, "");
-        panelNames.put(mapPanel, "Boroughs Map");
-        panelNames.put(statisticsPanel, "Statistics");
-        panelNames.put(searchEnginePanel, "Property Search");
-
+        namedPanels = new ArrayList<>(
+                Arrays.asList(new NamedPanel(welcomePanel, new Label("Welcome")), new NamedPanel(mapPanel, new Label("Borough Map")),
+                        new NamedPanel(statisticsPanel, new Label("Statistics")),  new NamedPanel(searchEnginePanel, new Label("Search"))));
+        root.setCenter(centerPanels.get(panelIndex)); // Show the first panel ("Welcome Panel") in the Application
+        populatePanelNames((Pane) topBar.getCenter());
+        namedPanels.get(panelIndex).getLabel().setTextFill(Color.color(0.286, 0.592, 0.922));
     }
 
 
@@ -166,7 +168,7 @@ public class View extends Application {
      * Create the JavaFX interface for the "Application Window" (to navigate between panels and select a price range).
      */
     private void initialiseApplicationWindow() {
-        BorderPane topBar = new BorderPane();
+        topBar = new BorderPane();
         topBar.setId("main-top");
         root.setTop(topBar);
 
@@ -206,10 +208,27 @@ public class View extends Application {
         priceRangeComponents.getChildren().addAll(fromLabel, fromComboBox, toLabel, toComboBox);
 
         // Label showing the name of the current center panel
-        panelName = new Label("");
-        panelName.setPadding(new Insets(0, 20, 0, 20));
-        BorderPane.setAlignment(panelName, Pos.CENTER_LEFT);
-        topBar.setCenter(panelName);
+        Pane activePanels = new FlowPane();
+        activePanels.setId("nav-bar");
+        activePanels.setPadding(new Insets(0, 20, 0, 20));
+        BorderPane.setAlignment(activePanels, Pos.BOTTOM_LEFT);
+        topBar.setCenter(activePanels);
+
+
+    }
+
+    /**
+     * Add the labels of all panels of the application to the top navigation bar of the window
+     */
+    private void populatePanelNames(Pane pane)
+    {
+        int count = 0;
+        for(NamedPanel panel : namedPanels){
+            if(count++ > 0){
+                pane.getChildren().add(new Label("/"));
+            }
+            pane.getChildren().add(panel.getLabel());
+        }
     }
 
     /**
@@ -291,8 +310,10 @@ public class View extends Application {
      * @param event The ActionEvent triggered by the user
      */
     private void backButtonAction(ActionEvent event) {
+        int previousIndex = panelIndex;
         panelIndex = (panelIndex-1+centerPanels.size())%(centerPanels.size()); // Index of previous panel
         setCenterPanel(panelIndex);
+        updatePanelsLabel(previousIndex, panelIndex);
     }
 
     /**
@@ -301,8 +322,10 @@ public class View extends Application {
      * @param event The ActionEvent triggered by the user
      */
     private void forwardButtonAction(ActionEvent event) {
+        int previousIndex = panelIndex;
         panelIndex = (panelIndex+1)%(centerPanels.size()); // Index of next panel
         setCenterPanel(panelIndex);
+        updatePanelsLabel(previousIndex, panelIndex);
     }
 
     /**
@@ -312,12 +335,22 @@ public class View extends Application {
     private void setCenterPanel(int panelIndex) {
         Node panel = centerPanels.get(panelIndex);
         root.setCenter(panel);
-        panelName.setText(panelNames.get(panel));
+        //panelName.setText(panelNames.get(panel));
         if (panel == statisticsPanel) {
             computeMostSearchedExpression();
         }
     }
 
+    /**
+     * Update the panels labels to show the currently active panel that the user is on
+     * @param prevIndex the panel index of the application the user switched away from
+     * @param currentIndex the panel index of the application the user switched to
+     */
+    private void updatePanelsLabel(int prevIndex, int currentIndex)
+    {
+        namedPanels.get(prevIndex).getLabel().setTextFill(new Color(0, 0, 0, 1));
+        namedPanels.get(currentIndex).getLabel().setTextFill(new Color(0.286, 0.592, 0.922, 1));
+    }
 
     /**
      * Add all items from an array into a ComboBox

@@ -26,6 +26,7 @@ import javafx.scene.text.*;
 import javafx.util.Duration;
 
 import java.awt.*;
+import java.io.*;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -72,9 +73,10 @@ public class View extends Application {
     private Statistic statNbOfEntireHomeApartments = new Statistic("Number of entire homes and apartments");
     private Statistic statMostExpensiveBorough = new Statistic("Most expensive borough");
     private Statistic statAvgPriceViewedProperties = new Statistic("Average price of all viewed properties");
+    private Statistic statMostSearchedExpression = new Statistic("Most searched expression (Property Search Panel)");
     // ADD 3 ADDITIONAL STATISTICS
     private ArrayList<Statistic> statistics = new ArrayList<>(Arrays.asList(
-            statAvgReviews, statNbOfProperties, statNbOfEntireHomeApartments, statMostExpensiveBorough, statAvgPriceViewedProperties
+            statAvgReviews, statNbOfProperties, statNbOfEntireHomeApartments, statMostExpensiveBorough, statAvgPriceViewedProperties, statMostSearchedExpression
     ));
 
     // Collection of viewed properties
@@ -140,6 +142,7 @@ public class View extends Application {
         //Initialising the "Statistics Panel" in the GUI
         initialiseStatisticsPanel();
         computeStatistics();
+        computeMostSearchedExpression();
 
         //Initialising the "Search Engine Panel" in the GUI
         initialiseSearchEnginePanel();
@@ -310,6 +313,9 @@ public class View extends Application {
         Node panel = centerPanels.get(panelIndex);
         root.setCenter(panel);
         panelName.setText(panelNames.get(panel));
+        if (panel == statisticsPanel) {
+            computeMostSearchedExpression();
+        }
     }
 
 
@@ -967,9 +973,73 @@ public class View extends Application {
 
             showSearchResults(searchResults);
 
+            appendSearchWordToFile(searchWord);
+
         } else if (searchField.getCharacters().isEmpty()) {
             showEmptyFieldAlert();
         }
+    }
+
+    /**
+     * Add the search word to the "search-words.txt" file.
+     * @param searchWord The searched expression to append to the file
+     */
+    private void appendSearchWordToFile(String searchWord) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("search-words.txt", true))) {
+            writer.write(searchWord.trim().toLowerCase() + "\n");
+        } catch(IOException e) {
+            System.out.println(e);
+        }
+    }
+
+    /**
+     * Find the most searched expression by reading from the "search-words.txt" file.
+     * Then update
+     */
+    private void computeMostSearchedExpression() {
+        List<String> searchedExpressions = readSearchedExpressionsFromFile();
+
+        // Count the number of occurrences of each expression
+        HashMap<String, Integer> expressionOccurrences = new HashMap<>();
+        for (String expression: searchedExpressions) {
+            Integer occurrences = expressionOccurrences.get(expression);
+            if (occurrences != null) {
+                expressionOccurrences.put(expression, occurrences+1);
+            } else {
+                expressionOccurrences.put(expression, 1);
+            }
+        }
+
+        // Get the most searched expression
+        String mostSearched = null;
+        Integer maxOccurrences = 0;
+        for (String expression: expressionOccurrences.keySet()) {
+            Integer occurrences = expressionOccurrences.get(expression);
+            if (occurrences > maxOccurrences) {
+                mostSearched = expression;
+                maxOccurrences = occurrences;
+            }
+        }
+
+        // Update the value of the statistic
+        statMostSearchedExpression.setValue(mostSearched);
+
+        // Update the statistic value shown in each "Statistic Box"
+        updateStatistics();
+    }
+
+    private List<String> readSearchedExpressionsFromFile() {
+        List<String> searchedExpressions = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader("search-words.txt"))) {
+            String line = reader.readLine();
+            while (line != null && ! line.equals("")) {
+                searchedExpressions.add(line);
+                line = reader.readLine();
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return searchedExpressions;
     }
 
     /**

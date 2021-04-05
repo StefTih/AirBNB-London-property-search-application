@@ -1,6 +1,7 @@
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -9,6 +10,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -20,7 +24,8 @@ import javafx.scene.text.*;
 
 import java.awt.*;
 import java.util.*;
-import java.util.concurrent.Flow;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class represents the view of our London Property Marketplace Application.
@@ -43,6 +48,7 @@ public class View extends Application {
     private ArrayList<Parent> centerPanels;
     private BorderPane welcomePanel;
     private BorderPane mapPanel;
+    private SplitPane searchEnginePanel;
     private GridPane statisticsPanel;
     // The index of the current shown panel
     private int panelIndex = 0;
@@ -57,8 +63,15 @@ public class View extends Application {
     private Statistic statNbOfProperties = new Statistic("Total number of available properties");
     private Statistic statNbOfEntireHomeApartments = new Statistic("Number of entire homes and apartments");
     private Statistic statMostExpensiveBorough = new Statistic("Most expensive borough");
-    // ADD 4 ADDITIONAL STATISTICS
-    private ArrayList<Statistic> statistics = new ArrayList<>(Arrays.asList(statAvgReviews, statNbOfProperties, statNbOfEntireHomeApartments, statMostExpensiveBorough, new Statistic("TEST")));
+    private Statistic statAvgPriceViewedProperties = new Statistic("Average price of all viewed properties");
+    private Statistic statTimeSpent = new Statistic("Time spent in the London Property Marketplace Application");
+    // ADD 3 ADDITIONAL STATISTICS
+    private ArrayList<Statistic> statistics = new ArrayList<>(Arrays.asList(
+            statAvgReviews, statNbOfProperties, statNbOfEntireHomeApartments, statMostExpensiveBorough, statAvgPriceViewedProperties, statTimeSpent
+    ));
+
+    // Collection of viewed properties
+    private HashMap<String, AirbnbListing> viewedProperties = new HashMap<>();
 
     // Collection of all 4 "Statistic Boxes"
     private ArrayList<StatisticBox> statisticBoxes;
@@ -73,6 +86,11 @@ public class View extends Application {
     private ArrayList<Button> mapButtons;
     //Stores the buttons that represent the properties in each neighbourhood
     private ArrayList<Button> propertyButtons;
+
+    //Text field for user to search properties
+    TextField searchField;
+    //DropDown List of boroughs
+    ComboBox<String> boroughsComboBox;
 
 
     /**
@@ -96,14 +114,13 @@ public class View extends Application {
 
         root = new BorderPane();
         primaryStage.setTitle("London Property Marketplace");
-        // The size of the window is adapted to the size of the screen
-
         Scene primaryScene = new Scene(root, 0.8*screenSize.getWidth(), 0.8*screenSize.getHeight());
         primaryScene.getStylesheets().addAll("main.css");
+        // The size of the window is adapted to the size of the screen
         primaryStage.setScene(primaryScene);
         primaryStage.show();
 
-        //Initialising the "Application Window" in the GUI
+        //Initialising the "Application Window" in te GUI
         initialiseApplicationWindow();
 
         //Initialising the "Welcome Panel" in the GUI
@@ -114,10 +131,13 @@ public class View extends Application {
         initialiseMapPanel();
 
         //Initialising the "Statistics Panel" in the GUI
-        computeStatistics();
         initialiseStatisticsPanel();
+        computeStatistics();
 
-        centerPanels = new ArrayList<Parent>(Arrays.asList(welcomePanel, mapPanel, statisticsPanel));
+        //Initialising the "Search Engine Panel" in the GUI
+        initialiseSearchEnginePanel();
+
+        centerPanels = new ArrayList<Parent>(Arrays.asList(welcomePanel, mapPanel, statisticsPanel, searchEnginePanel));
         root.setCenter(centerPanels.get(0)); // Show the first panel ("Welcome Panel") in the Application
 
     }
@@ -134,14 +154,13 @@ public class View extends Application {
         BorderPane topBar = new BorderPane();
         root.setTop(topBar);
 
-        // Common parameters for HBoxes
-        int hBoxSpacing = 10;
+        // Common padding parameter for HBoxes
         Insets hBoxPadding = new Insets(10, 10, 10, 10);
 
         // Create the "<" and ">" buttons to navigate between panels
         HBox navigationButtons = new HBox();
         topBar.setLeft(navigationButtons);
-        navigationButtons.setSpacing(hBoxSpacing);
+        navigationButtons.setSpacing(10);
         navigationButtons.setPadding(hBoxPadding);
         backButton = new Button("<");
         backButton.setOnAction(this:: backButtonAction);
@@ -155,10 +174,10 @@ public class View extends Application {
         HBox priceRangeComponents = new HBox();
         topBar.setRight(priceRangeComponents);
         priceRangeComponents.setAlignment(Pos.CENTER);
-        priceRangeComponents.setSpacing(hBoxSpacing);
+        priceRangeComponents.setSpacing(5);
         priceRangeComponents.setPadding(hBoxPadding);
-        Label fromLabel = new Label("From: ");
-        Label toLabel = new Label("To: ");
+        Label fromLabel = new Label("From:   \u00A3");
+        Label toLabel = new Label("To:   \u00A3");
         fromComboBox = new ComboBox(); // DropDown List for minimum price
         String[] fromItems = new String[] {
                 "0", "50", "100", "150", "200", "250", "300", "350", "400", "450", "500", "1000"};
@@ -183,12 +202,7 @@ public class View extends Application {
         } else {
             fromPrice = null;
         }
-        boolean invalidRange = invalidPriceRange();
-        enableButtons(invalidRange); // Enable or Disable the navigation between panels depending on the validity of the selected price range
-        if (! invalidRange) {
-            computeProperties(); // Collect the proprieties that correspond to the selected price range
-        }
-        showPriceRange(invalidRange);
+        changedPriceRangeAction(); // Check price range and execute relevant actions
     }
 
     /**
@@ -203,17 +217,24 @@ public class View extends Application {
         } else {
             toPrice = null;
         }
+        changedPriceRangeAction(); // Check price range and execute relevant actions
+    }
+
+    /**
+     * Check the selected price range and execute relevant actions
+     * (enable buttons, compute properties and show the price range).
+     */
+    private void changedPriceRangeAction() {
         boolean invalidRange = invalidPriceRange();
         enableButtons(invalidRange); // Enable or Disable the navigation between panels depending on the validity of the selected price range
         if (! invalidRange) {
             computeProperties(); // Collect the proprieties that correspond to the selected price range
         }
-        showPriceRange(invalidRange);
+        showPriceRange(invalidRange); // Show the price range in the Welcome Panel
     }
 
     /**
-     * Enable or Disable the "<" and ">" buttons to navigate between panels,
-     * depending on the validity of the price range selected by the user.
+     * Enable or Disable the "<" and ">" buttons to navigate between panels, depending on the validity of the price range selected by the user.
      * @param invalidRange Whether the price range selected by the user is invalid
      */
     private void enableButtons(boolean invalidRange)
@@ -279,6 +300,7 @@ public class View extends Application {
 
 
     //Welcome window methods
+
     private void initialiseWelcomePanel()
     {
         welcomePanel = new BorderPane();
@@ -387,8 +409,8 @@ public class View extends Application {
     }
 
     /**
-    This method creates the user interface for the map panel.
-    **/
+     This method creates the user interface for the map panel.
+     **/
     private void initialiseMapPanel()
     {
 
@@ -424,7 +446,7 @@ public class View extends Application {
         Label key = new Label("Key:");
         key.setFont(Font.font("Arial",FontWeight.BOLD,12));
 
-        Label lowVol = new Label("Low Volume of Properties: red " );
+        Label lowVol = new Label("Low Volume of Properties: red" );
         lowVol.setFont(Font.font("Arial",FontWeight.BOLD,12));
         lowVol.styleProperty().set(mapInfo.getLowVol());
 
@@ -598,7 +620,7 @@ public class View extends Application {
                     +"\nMinimum number of nights that someone can stay: "+propertyInfo.getMinimumNights());
             property.setPadding(vBoxPadding);
             propertyButtons.add(property);
-            property.setOnAction(p ->showDescription(propertyInfo.getId()));
+            property.setOnAction(p ->showDescription(propertyInfo));
         }
 
         vBox.getChildren().addAll(propertyButtons);
@@ -607,12 +629,15 @@ public class View extends Application {
 
     /**
      * This method shows the description of each property on the right side of the border pane
-     * @param propertyID holds the id of the property as a string
+     * @param property holds the property as an instance of AirbnbListing
      */
-    private void showDescription(String propertyID)
+    private void showDescription(AirbnbListing property)
     {
-        Label propertyDescription = new Label(mapInfo.showPropertyDescription(propertyID));
+        Label propertyDescription = new Label(mapInfo.showPropertyDescription(property.getId()));
         root2.setRight(propertyDescription);
+
+        viewedProperties.put(property.getId(), property);
+        computeAvgPriceViewedProperties();
     }
 
     /**
@@ -657,42 +682,10 @@ public class View extends Application {
 
         computeStatistics(); // Compute the statistics according to the current list of properties
 
-        updateStatistics(); // Update the value statistic shown in each "Statistic Box"
-
         //Updates the details regarding the map panel
         mapInfo.setPropertyData(properties);
 
         setColour(mapButtons);
-    }
-
-    /**
-     * Compute the statistics according to the current list of properties (depending on selected price range).
-     */
-    private void computeStatistics() {
-        // Compute number of reviews
-        if (properties.isEmpty()) {
-            statAvgReviews.setValue("-");
-        } else {
-            double count = 0;
-            for (AirbnbListing property : properties) {
-                count += property.getNumberOfReviews();
-            }
-            statAvgReviews.setValue(String.valueOf(count/properties.size()));
-        }
-
-        // Compute number of available properties
-        statNbOfProperties.setValue(String.valueOf(properties.size()));
-
-        // Compute number of entire homes and apartments
-        statNbOfEntireHomeApartments.setValue(
-            String.valueOf(properties.stream().filter(p -> (p.getRoom_type().equals("Entire home/apt"))).count())
-        );
-
-        // Compute most expensive borough
-        statMostExpensiveBorough.setValue(mostExpensiveBorough());
-
-        // ADD 4 ADDITIONAL STATS
-
     }
 
     /**
@@ -727,6 +720,37 @@ public class View extends Application {
         StatisticBox statisticBox4 = new StatisticBox(this);
         statisticsPanel.add(statisticBox4, 1, 1);
         statisticBoxes.add(statisticBox4);
+
+    }
+
+    /**
+     * Compute the statistics according to the current list of properties (depending on selected price range).
+     */
+    private void computeStatistics() {
+        // Compute number of reviews
+        if (properties.isEmpty()) {
+            statAvgReviews.setValue(null);
+        } else {
+            double count = 0;
+            for (AirbnbListing property : properties) {
+                count += property.getNumberOfReviews();
+            }
+            statAvgReviews.setValue(String.valueOf(count/properties.size()));
+        }
+
+        // Compute number of available properties
+        statNbOfProperties.setValue(String.valueOf(properties.size()));
+
+        // Compute number of entire homes and apartments
+        statNbOfEntireHomeApartments.setValue(
+                String.valueOf(properties.stream().filter(p -> (p.getRoom_type().equals("Entire home/apt"))).count())
+        );
+
+        // Compute most expensive borough
+        statMostExpensiveBorough.setValue(mostExpensiveBorough());
+
+        // Update the statistic value shown in each "Statistic Box"
+        updateStatistics();
 
     }
 
@@ -778,6 +802,23 @@ public class View extends Application {
     }
 
     /**
+     * Calculates the average price of all properties viewed by the user.
+     */
+    private void computeAvgPriceViewedProperties() {
+        if (viewedProperties.isEmpty()) {
+            statAvgPriceViewedProperties.setValue(null);
+        } else {
+            statAvgPriceViewedProperties.setValue(
+                    "\u00A3" + String.valueOf(viewedProperties.values().stream().map(property -> property.getPrice()).reduce(0, (count, price) -> count + price) / viewedProperties.size())
+            );
+        }
+
+        // Update the statistic value shown in each "Statistic Box"
+        updateStatistics();
+    }
+
+
+    /**
      * Get the current statistics as an ArrayList.
      * @return The ArrayList of the current statistics
      */
@@ -802,12 +843,121 @@ public class View extends Application {
     }
 
     /**
-     * Update the value of the statistic show in each "Statistic Box".
+     * Update the value of the statistic shown in each "Statistic Box".
      */
     private void updateStatistics() {
         for (StatisticBox box: statisticBoxes) {
             box.setStatistic();
         }
+    }
+
+
+    // Search Engine Panel methods
+
+    /**
+     * Create the JavaFX interface for the "Search Engine Panel" (search for properties by name).
+     */
+    private void initialiseSearchEnginePanel()
+    {
+        // Create the panel as a SplitPane
+        HBox searchBar = new HBox();
+        searchBar.setAlignment(Pos.CENTER);
+        ScrollPane resultsPanel = new ScrollPane();
+        searchEnginePanel = new SplitPane(searchBar, resultsPanel);
+        searchEnginePanel.setOrientation(Orientation.VERTICAL);
+        searchEnginePanel.setDividerPosition(0, 0.1);
+
+        boroughsComboBox = new ComboBox<>();
+        boroughsComboBox.setPromptText("ALL BOROUGHS");
+        fillBoroughsComboBox();
+        searchField = new TextField();
+        searchField.setPromptText("Property name");
+        searchField.setPrefWidth(300);
+        searchField.setOnKeyPressed(this::searchKeyPressed);
+        Button searchButton = new Button("SEARCH");
+        searchButton.setOnAction(this::search);
+        searchBar.getChildren().addAll(boroughsComboBox, searchField, searchButton);
+    }
+
+    /**
+     * Add all boroughs as elements of the BoroughsComboBox.
+     */
+    private void fillBoroughsComboBox() {
+        boroughsComboBox.getItems().add("ALL BOROUGHS");
+        for (String[] row: mapInfo.getLondonBoroughs()) {
+            String borough = row[0];
+            boroughsComboBox.getItems().add(borough);
+        }
+    }
+
+    /**
+     * Search for properties if the user presses the Enter key while writing in the Search Text Field.
+     * @param event The KeyEvent triggered by the user
+     */
+    private void searchKeyPressed(KeyEvent event) {
+        if (event.getCode().equals(KeyCode.ENTER)) {
+            search(null);
+        }
+    }
+
+    /**
+     * Search for properties according to the prefix specified in the Text Field.
+     * @param event The ActionEvent triggered by the user
+     */
+    private void search(ActionEvent event) {
+        if (! (searchField.getCharacters().isEmpty() || invalidPriceRange())) {
+            // Search for properties within the selected price range and corresponding with the search prefix
+            String searchWord = searchField.getCharacters().toString().trim().toLowerCase();
+            String selectedBorough = boroughsComboBox.getSelectionModel().getSelectedItem();
+            List<AirbnbListing> searchResults =  properties.stream().filter(p -> p.getName().toLowerCase().contains(searchWord)).collect(Collectors.toList());
+            if (selectedBorough != null && (! selectedBorough.equals("ALL BOROUGHS"))) {
+                searchResults = searchResults.stream().filter(p -> p.getNeighbourhood().equals(selectedBorough)).collect(Collectors.toList());
+            }
+
+            if (searchResults.isEmpty()) {
+                showEmptyResultsAlert();
+            }
+
+            showSearchResults(searchResults);
+
+        } else if (searchField.getCharacters().isEmpty()) {
+            showEmptyFieldAlert();
+        }
+    }
+
+    /**
+     * Show the search results.
+     */
+    private void showSearchResults(List<AirbnbListing> searchResults)
+    {
+        for (AirbnbListing property: searchResults) {
+            System.out.println(property.getName() + " - " + property.getNeighbourhood());
+        }
+    }
+
+
+    /**
+     * Show an Alert Dialog to state that the Search has found no properties has a result.
+     */
+    private void showEmptyResultsAlert() {
+        // Show an Alert Dialog
+        Alert emptyResultsAlert = new Alert(Alert.AlertType.ERROR);
+        emptyResultsAlert.setTitle("Empty Result");
+        emptyResultsAlert.setHeaderText("The Search has found no corresponding property.");
+        emptyResultsAlert.setContentText("There is no property corresponding to the input characteristics.");
+        emptyResultsAlert.showAndWait();
+    }
+
+    /**
+     * Show an Alert Dialog to state that the Search Field is empty (not specified by user).
+     */
+    private void showEmptyFieldAlert() {
+        // Show an Alert Dialog
+        Alert emptyFieldAlert = new Alert(Alert.AlertType.WARNING);
+        emptyFieldAlert.setTitle("Empty Search Field");
+        emptyFieldAlert.setHeaderText("The Search Field is empty.");
+        emptyFieldAlert.setContentText("Please provide an expression to search the properties.");
+        emptyFieldAlert.showAndWait();
     }
 
 

@@ -59,7 +59,6 @@ public class StatisticBox extends BorderPane {
         setCenter(statistic);
 
         statisticName = new Label("Statistic Name");
-        statisticName.setAlignment(Pos.CENTER);
         BorderPane.setAlignment(statisticName, Pos.CENTER);
         statistic.setTop(statisticName);
 

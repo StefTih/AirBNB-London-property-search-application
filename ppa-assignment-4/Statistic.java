@@ -35,6 +35,10 @@ public class Statistic {
      * @param newValue The statistic's new value
      */
     public void setValue(String newValue) {
-        value = newValue;
+        if (newValue != null) {
+            value = newValue;
+        } else {
+            value = "-";
+        }
     }
 }

@@ -4,7 +4,7 @@ import java.util.*;
  * Represents the properties currently available on the map of London Boroughs based on the price
  * constraints set from the user. It possesses methods which extract, sort and search for data from
  * the available properties.
- * @Author: Tihomir Stefanov; Alexandru Bularca
+ * @Author: Tihomir Stefanov; Alexandru Bularca, Jessy Briard, Ravshanbek Rozukulov
  */
 
 public class MapInfo {
@@ -23,6 +23,8 @@ public class MapInfo {
     private static final String MED_VOL = "-fx-background-color:#ffeaa7";
     //Colour for low high volume number of properties
     private static final String HIGH_VOL = "-fx-background-color:#55efc4";
+    //Colour for absence of corresponding properties
+    private static final String NO_PROPERTY = "-fx-background-color:#D0D0D0";
 
     //The boroughs of London and their corresponding coordinates in the map.
     private String[][] LondonBoroughs;
@@ -37,6 +39,15 @@ public class MapInfo {
     {
         LondonBoroughs = new String[NUM_BOROUGHS][INFO_INDEX];
         LondonAbbreviations = new HashMap<String,String>();
+    }
+
+    /**
+     * Return the colour with which neighbourhoods with no properties corresponding to the selected
+     * price range will be represented.
+     * @return a string with the colour in CSS style
+     */
+    public String getNoProperty() {
+        return NO_PROPERTY;
     }
 
     /**
@@ -95,16 +106,31 @@ public class MapInfo {
         }
     }
 
+    /**
+     * Link an abbreviation to its borough.
+     * @param abbreviation The borough's abbreviation
+     * @param borough The borough to link the abbreviation to
+     */
     public void addAbbreviations(String abbreviation, String borough)
     {
         LondonAbbreviations.put(abbreviation,borough);
     }
 
+    /**
+     * This method returns the neighbourhood's name from a specified abbreviation.
+     * @param abbreviation The borough's abbreviation
+     * @return The corresponding borough's name
+     */
     public String getNeighbourhood(String abbreviation)
     {
         return LondonAbbreviations.get(abbreviation);
     }
 
+    /**
+     * This method returns the abbreviation linked to the specified borough
+     * @param borough The borough to get the abbreviation from
+     * @return The borough's abbreviation
+     */
     public String getAbbreviation(String borough)
     {
         String key = null;
@@ -137,14 +163,24 @@ public class MapInfo {
     }
 
     /**
-     * This method counts the total number of properties that are currently on sale in a specified
-     * neighbourhood.It returns a color scheme for the map of the boroughs.
+     * This method returns a color scheme for the map of the boroughs, corresponding to the number of properties
+     * in the borough in the selected price range.
      * @param neighbourhood a string variable which stores the name of the neighbourhood
      * @return the hexadecimal representation of the colour to show on the map for that neighbourhood
      */
     public String propertyVolumeColour(String neighbourhood)
     {
 
+        int counter = getNumberOfOccurrences(neighbourhood);
+        return compareVolume(counter);
+    }
+
+    /**
+     * This method counts the total number of properties that are currently on sale in a specified neighbourhood.
+     * @return The number of occurrences of a neighbourhood in the list of properties corresponding to the selected price range
+     */
+    public int getNumberOfOccurrences(String neighbourhood)
+    {
         int counter = 0;
         for (AirbnbListing ar:propertyList)
         {
@@ -153,7 +189,7 @@ public class MapInfo {
                 counter+=1;
             }
         }
-        return compareVolume(counter);
+        return counter;
     }
 
     /**
@@ -190,7 +226,10 @@ public class MapInfo {
      */
     private String compareVolume(int counter)
     {
-        if (counter>=0 && counter<LOW_MID_BOUNDARY)
+        if (counter == 0) {
+            return NO_PROPERTY;
+        }
+        else if (counter>=0 && counter<LOW_MID_BOUNDARY)
         {
             return LOW_VOL;
         }

@@ -299,6 +299,10 @@ public class View extends Application {
         root.setCenter(centerPanels.get(panelIndex));
     }
 
+    /**
+     * Change the center panel to the panel corresponding to the index passed as parameter.
+     * @param panelIndex The index of the panel to set as center panel
+     */
     private void setCenterPanel(int panelIndex) {
         Node panel = centerPanels.get(panelIndex);
         root.setCenter(panel);
@@ -466,22 +470,28 @@ public class View extends Application {
         //each one explaining the volume of properties in each borough
         VBox bottom = new VBox();
 
-        Label key = new Label("Key:");
-        key.setFont(Font.font("Arial",FontWeight.BOLD,12));
+        Font font = Font.font("Arial",FontWeight.BOLD,12);
 
-        Label lowVol = new Label("Low Volume of Properties: red" );
-        lowVol.setFont(Font.font("Arial",FontWeight.BOLD,12));
+        Label key = new Label("Key:");
+        key.setFont(font);
+
+        Label noProperty = new Label("No corresponding Properties: grey");
+        noProperty.setFont(font);
+        noProperty.styleProperty().set(mapInfo.getNoProperty());
+
+        Label lowVol = new Label("Low Volume of Properties: red");
+        lowVol.setFont(font);
         lowVol.styleProperty().set(mapInfo.getLowVol());
 
         Label medVol = new Label("Medium Volume of Properties: yellow");
         medVol.styleProperty().set(mapInfo.getMedVol());
-        medVol.setFont(Font.font("Arial",FontWeight.BOLD,12));
+        medVol.setFont(font);
 
         Label highVol = new Label("High Volume of Properties: green");
         highVol.styleProperty().set(mapInfo.getHighVol());
-        highVol.setFont(Font.font("Arial",FontWeight.BOLD,12));
+        highVol.setFont(font);
 
-        bottom.getChildren().addAll(key,lowVol,medVol,highVol);
+        bottom.getChildren().addAll(key, noProperty, lowVol,medVol,highVol);
 
 
         mapPanel.setBottom(bottom);
@@ -530,28 +540,36 @@ public class View extends Application {
      */
     private void showPropertiesInBorough(String boroughName)
     {
-        //Setting up the new stage
-        Stage secondaryStage = new Stage();
-        secondaryStage.setTitle(boroughName);
+        if (mapInfo.getNumberOfOccurrences(boroughName) != 0) {
+            //Setting up the new stage
+            Stage secondaryStage = new Stage();
+            secondaryStage.setTitle(boroughName);
 
-        //Getting the dimensions of the screen
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+            //Getting the dimensions of the screen
+            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-        //Creating the new Border pane
-        root2 = new BorderPane();
+            //Creating the new Border pane
+            root2 = new BorderPane();
 
-        //Creating the top menu options
-        makeMenuBar(boroughName);
+            //Creating the top menu options
+            makeMenuBar(boroughName);
 
-        //Creating the scrollbar and setting it to the center of the pane
-        scrollBar = new ScrollPane();
-        scrollBar.setContent(addPropertyInfo(boroughName));
-        root2.setCenter(scrollBar);
+            //Creating the scrollbar and setting it to the center of the pane
+            scrollBar = new ScrollPane();
+            scrollBar.setContent(addPropertyInfo(boroughName));
+            root2.setCenter(scrollBar);
 
-        //Creating the scene of the stage
-        secondaryStage.setScene(new Scene(root2, 0.6*screenSize.getWidth(), 0.6*screenSize.getHeight()));
-        secondaryStage.show();
-
+            //Creating the scene of the stage
+            secondaryStage.setScene(new Scene(root2, 0.6 * screenSize.getWidth(), 0.6 * screenSize.getHeight()));
+            secondaryStage.show();
+        } else {
+            // Show an Alert Dialog
+            Alert noPropertyAlert = new Alert(Alert.AlertType.ERROR);
+            noPropertyAlert.setTitle("No Property");
+            noPropertyAlert.setHeaderText("There is no property in this borough corresponding to the selected price range.");
+            noPropertyAlert.setContentText("Please select another borough or price range.");
+            noPropertyAlert.showAndWait();
+        }
     }
 
     /**

@@ -3,6 +3,7 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -44,6 +45,7 @@ public class View extends Application {
     private ComboBox toComboBox;
     private Integer fromPrice;
     private Integer toPrice;
+    private Label panelName;
 
     private ArrayList<Parent> centerPanels;
     private BorderPane welcomePanel;
@@ -52,6 +54,8 @@ public class View extends Application {
     private GridPane statisticsPanel;
     // The index of the current shown panel
     private int panelIndex = 0;
+    // Collection of the names of the center panels
+    private HashMap<Parent, String> panelNames = new HashMap<>();
 
     // The welcome page
     private String welcomeParagraph = "This application shows information about all available airbnb properties in every london borough based on the given price range.\n\nHow to use:\n\nSelect a preferred price range. Click on a borough on the borough map to see its listings. Click on a property to view its details. Go to the statistics page to view the statistics of listings in the selected price range.\n\nSelected price range:\n";
@@ -64,10 +68,9 @@ public class View extends Application {
     private Statistic statNbOfEntireHomeApartments = new Statistic("Number of entire homes and apartments");
     private Statistic statMostExpensiveBorough = new Statistic("Most expensive borough");
     private Statistic statAvgPriceViewedProperties = new Statistic("Average price of all viewed properties");
-    private Statistic statTimeSpent = new Statistic("Time spent in the London Property Marketplace Application");
     // ADD 3 ADDITIONAL STATISTICS
     private ArrayList<Statistic> statistics = new ArrayList<>(Arrays.asList(
-            statAvgReviews, statNbOfProperties, statNbOfEntireHomeApartments, statMostExpensiveBorough, statAvgPriceViewedProperties, statTimeSpent
+            statAvgReviews, statNbOfProperties, statNbOfEntireHomeApartments, statMostExpensiveBorough, statAvgPriceViewedProperties
     ));
 
     // Collection of viewed properties
@@ -140,6 +143,11 @@ public class View extends Application {
         centerPanels = new ArrayList<Parent>(Arrays.asList(welcomePanel, mapPanel, statisticsPanel, searchEnginePanel));
         root.setCenter(centerPanels.get(0)); // Show the first panel ("Welcome Panel") in the Application
 
+        panelNames.put(welcomePanel, "");
+        panelNames.put(mapPanel, "Boroughs Map");
+        panelNames.put(statisticsPanel, "Statistics");
+        panelNames.put(searchEnginePanel, "Property Search");
+
     }
 
 
@@ -188,6 +196,12 @@ public class View extends Application {
         addItemsToComboBox(toComboBox, toItems);
         toComboBox.setOnAction(this:: toComboBoxAction);
         priceRangeComponents.getChildren().addAll(fromLabel, fromComboBox, toLabel, toComboBox);
+
+        // Label showing the name of the current center panel
+        panelName = new Label("");
+        panelName.setPadding(new Insets(0, 20, 0, 20));
+        BorderPane.setAlignment(panelName, Pos.CENTER_LEFT);
+        topBar.setCenter(panelName);
     }
 
     /**
@@ -270,6 +284,7 @@ public class View extends Application {
      */
     private void backButtonAction(ActionEvent event) {
         panelIndex = (panelIndex-1+centerPanels.size())%(centerPanels.size()); // Index of previous panel
+        setCenterPanel(panelIndex);
         root.setCenter(centerPanels.get(panelIndex));
     }
 
@@ -280,7 +295,15 @@ public class View extends Application {
      */
     private void forwardButtonAction(ActionEvent event) {
         panelIndex = (panelIndex+1)%(centerPanels.size()); // Index of next panel
+        setCenterPanel(panelIndex);
         root.setCenter(centerPanels.get(panelIndex));
+    }
+
+    private void setCenterPanel(int panelIndex) {
+        Node panel = centerPanels.get(panelIndex);
+        root.setCenter(panel);
+        String name = panelNames.get(panel);
+        panelName.setText(panelNames.get(panel));
     }
 
 

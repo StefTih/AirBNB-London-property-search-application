@@ -848,6 +848,10 @@ public class View extends Application {
                 searchResults = searchResults.stream().filter(p -> p.getNeighbourhood().equals(selectedBorough)).collect(Collectors.toList());
             }
 
+            if (searchResults.isEmpty()) {
+                showEmptyResultsAlert();
+            }
+
             showSearchResults(searchResults);
 
         } else if (searchField.getCharacters().isEmpty()) {
@@ -866,6 +870,21 @@ public class View extends Application {
     }
 
 
+    /**
+     * Show an Alert Dialog to state that the Search has found no properties has a result.
+     */
+    private void showEmptyResultsAlert() {
+        // Show an Alert Dialog
+        Alert emptyResultsAlert = new Alert(Alert.AlertType.ERROR);
+        emptyResultsAlert.setTitle("Empty Result");
+        emptyResultsAlert.setHeaderText("The Search has found no corresponding property.");
+        emptyResultsAlert.setContentText("There is no property corresponding to the input characteristics.");
+        emptyResultsAlert.showAndWait();
+    }
+
+    /**
+     * Show an Alert Dialog to state that the Search Field is empty (not specified by user).
+     */
     private void showEmptyFieldAlert() {
         // Show an Alert Dialog
         Alert emptyFieldAlert = new Alert(Alert.AlertType.WARNING);

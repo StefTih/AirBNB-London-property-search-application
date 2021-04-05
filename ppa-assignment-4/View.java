@@ -1,9 +1,9 @@
-import javafx.animation.FillTransition;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -47,6 +47,7 @@ public class View extends Application {
     private ComboBox toComboBox;
     private Integer fromPrice;
     private Integer toPrice;
+    private Label panelName;
 
     private ArrayList<Parent> centerPanels;
     private BorderPane welcomePanel;
@@ -55,6 +56,8 @@ public class View extends Application {
     private GridPane statisticsPanel;
     // The index of the current shown panel
     private int panelIndex = 0;
+    // Collection of the names of the center panels
+    private HashMap<Parent, String> panelNames = new HashMap<>();
 
     // The welcome page
     private String welcomeParagraph = "This application shows information about all available airbnb properties in every london borough based on the given price range." +
@@ -69,10 +72,9 @@ public class View extends Application {
     private Statistic statNbOfEntireHomeApartments = new Statistic("Number of entire homes and apartments");
     private Statistic statMostExpensiveBorough = new Statistic("Most expensive borough");
     private Statistic statAvgPriceViewedProperties = new Statistic("Average price of all viewed properties");
-    private Statistic statTimeSpent = new Statistic("Time spent in the London Property Marketplace Application");
     // ADD 3 ADDITIONAL STATISTICS
     private ArrayList<Statistic> statistics = new ArrayList<>(Arrays.asList(
-            statAvgReviews, statNbOfProperties, statNbOfEntireHomeApartments, statMostExpensiveBorough, statAvgPriceViewedProperties, statTimeSpent
+            statAvgReviews, statNbOfProperties, statNbOfEntireHomeApartments, statMostExpensiveBorough, statAvgPriceViewedProperties
     ));
 
     // Collection of viewed properties
@@ -145,6 +147,11 @@ public class View extends Application {
         centerPanels = new ArrayList<Parent>(Arrays.asList(welcomePanel, mapPanel, statisticsPanel, searchEnginePanel));
         root.setCenter(centerPanels.get(0)); // Show the first panel ("Welcome Panel") in the Application
 
+        panelNames.put(welcomePanel, "");
+        panelNames.put(mapPanel, "Boroughs Map");
+        panelNames.put(statisticsPanel, "Statistics");
+        panelNames.put(searchEnginePanel, "Property Search");
+
     }
 
 
@@ -194,6 +201,12 @@ public class View extends Application {
         addItemsToComboBox(toComboBox, toItems);
         toComboBox.setOnAction(this:: toComboBoxAction);
         priceRangeComponents.getChildren().addAll(fromLabel, fromComboBox, toLabel, toComboBox);
+
+        // Label showing the name of the current center panel
+        panelName = new Label("");
+        panelName.setPadding(new Insets(0, 20, 0, 20));
+        BorderPane.setAlignment(panelName, Pos.CENTER_LEFT);
+        topBar.setCenter(panelName);
     }
 
     /**
@@ -276,7 +289,7 @@ public class View extends Application {
      */
     private void backButtonAction(ActionEvent event) {
         panelIndex = (panelIndex-1+centerPanels.size())%(centerPanels.size()); // Index of previous panel
-        root.setCenter(centerPanels.get(panelIndex));
+        setCenterPanel(panelIndex);
     }
 
     /**
@@ -286,7 +299,17 @@ public class View extends Application {
      */
     private void forwardButtonAction(ActionEvent event) {
         panelIndex = (panelIndex+1)%(centerPanels.size()); // Index of next panel
-        root.setCenter(centerPanels.get(panelIndex));
+        setCenterPanel(panelIndex);
+    }
+
+    /**
+     * Change the center panel to the panel corresponding to the index passed as parameter.
+     * @param panelIndex The index of the panel to set as center panel
+     */
+    private void setCenterPanel(int panelIndex) {
+        Node panel = centerPanels.get(panelIndex);
+        root.setCenter(panel);
+        panelName.setText(panelNames.get(panel));
     }
 
 
@@ -450,22 +473,28 @@ public class View extends Application {
         //each one explaining the volume of properties in each borough
         VBox bottom = new VBox();
 
-        Label key = new Label("Key:");
-        key.setFont(Font.font("Arial",FontWeight.BOLD,12));
+        Font font = Font.font("Arial",FontWeight.BOLD,12);
 
-        Label lowVol = new Label("Low Volume of Properties: red" );
-        lowVol.setFont(Font.font("Arial",FontWeight.BOLD,12));
+        Label key = new Label("Key:");
+        key.setFont(font);
+
+        Label noProperty = new Label("No corresponding Properties: grey");
+        noProperty.setFont(font);
+        noProperty.styleProperty().set(mapInfo.getNoProperty());
+
+        Label lowVol = new Label("Low Volume of Properties: red");
+        lowVol.setFont(font);
         lowVol.styleProperty().set(mapInfo.getLowVol());
 
         Label medVol = new Label("Medium Volume of Properties: yellow");
         medVol.styleProperty().set(mapInfo.getMedVol());
-        medVol.setFont(Font.font("Arial",FontWeight.BOLD,12));
+        medVol.setFont(font);
 
         Label highVol = new Label("High Volume of Properties: green");
         highVol.styleProperty().set(mapInfo.getHighVol());
-        highVol.setFont(Font.font("Arial",FontWeight.BOLD,12));
+        highVol.setFont(font);
 
-        bottom.getChildren().addAll(key,lowVol,medVol,highVol);
+        bottom.getChildren().addAll(key, noProperty, lowVol,medVol,highVol);
 
 
         mapPanel.setBottom(bottom);
@@ -514,31 +543,39 @@ public class View extends Application {
      */
     private void showPropertiesInBorough(String boroughName)
     {
-        //Setting up the new stage
-        Stage secondaryStage = new Stage();
-        secondaryStage.setTitle(boroughName);
+        if (mapInfo.getNumberOfOccurrences(boroughName) != 0) {
+            //Setting up the new stage
+            Stage secondaryStage = new Stage();
+            secondaryStage.setTitle(boroughName);
 
-        //Getting the dimensions of the screen
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+            //Getting the dimensions of the screen
+            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-        //Creating the new Border pane
-        root2 = new BorderPane();
+            //Creating the new Border pane
+            root2 = new BorderPane();
         root2.setId("borough-pane");
 
-        //Creating the top menu options
-        makeMenuBar(boroughName);
+            //Creating the top menu options
+            makeMenuBar(boroughName);
 
-        //Creating the scrollbar and setting it to the center of the pane
-        scrollBar = new ScrollPane();
-        scrollBar.setContent(addPropertyInfo(boroughName));
-        root2.setCenter(scrollBar);
+            //Creating the scrollbar and setting it to the center of the pane
+            scrollBar = new ScrollPane();
+            scrollBar.setContent(addPropertyInfo(boroughName));
+            root2.setCenter(scrollBar);
 
-        //Creating the scene of the stage
-        Scene secondaryScene = new Scene(root2, 0.6*screenSize.getWidth(), 0.6*screenSize.getHeight());
+            //Creating the scene of the stage
+            Scene secondaryScene = new Scene(root2, 0.6*screenSize.getWidth(), 0.6*screenSize.getHeight());
         secondaryScene.getStylesheets().add("main.css");
         secondaryStage.setScene(secondaryScene);
-        secondaryStage.show();
-
+            secondaryStage.show();
+        } else {
+            // Show an Alert Dialog
+            Alert noPropertyAlert = new Alert(Alert.AlertType.ERROR);
+            noPropertyAlert.setTitle("No Property");
+            noPropertyAlert.setHeaderText("There is no property in this borough corresponding to the selected price range.");
+            noPropertyAlert.setContentText("Please select another borough or price range.");
+            noPropertyAlert.showAndWait();
+        }
     }
 
     /**

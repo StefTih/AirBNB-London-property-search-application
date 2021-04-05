@@ -1,5 +1,5 @@
 #welcome-panel{
-    -fx-background-color: #FFFFFF;
+    -fx-background-color: #ffffff;
     -fx-padding: 30;
     -fx-font-family: "Arial";
 }
@@ -31,8 +31,12 @@
     -fx-text-fill: #000000;
 }
 
+#map-label{
+    -fx-text-fill: #000000;
+}
+
 #map-panel{
-    -fx-background-color: #FFFFFF;
+    -fx-background-color: #ffffff;
     -fx-padding: 50;
 }
 
@@ -46,3 +50,67 @@
     -fx-border-color: rgba(1, 161, 254, 1);
 }
 
+#main-top{
+    -fx-background-color: #ffffff;
+    -fx-font-family: "Arial";
+    -fx-font-size: 14;
+
+}
+
+#main-top .combo-box{
+    -fx-background-color: #ffffff;
+    -fx-border-color: #000000;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 3;
+}
+
+#main-top .combo-box:showing {
+    -fx-border-color: #4997eb;
+}
+
+#main-top .combo-box .list-cell:hover{
+    -fx-background-color: #4997eb;
+}
+
+#main-top .combo-box .list-view .list-cell:selected{
+    -fx-background-color: #4997eb;
+}
+
+#main-top .button{
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #000000;
+    -fx-font-size: 17;
+    -fx-border-color: rgba(255, 222, 255, 0);
+    -fx-border-radius: 0;
+}
+
+#main-top .button:hover{
+    -fx-background-color: #4997eb;
+    -fx-text-fill: #ffffff;
+}
+
+#borough-pane{
+    -fx-background-color: #ffffff;
+}
+
+#borough-pane .menu-bar{
+    -fx-background-color: #ffffff;
+    -fx-font-family: "Arial";
+    -fx-font-size: 13;
+}
+
+#borough-pane .menu-bar .menu:hover{
+    -fx-background-color: #4997eb;
+}
+
+#borough-pane .menu-bar .menu:showing{
+    -fx-background-color: #4997eb;
+}
+
+#borough-pane .menu-bar .menu .menu-item:hover{
+    -fx-background-color: #4997eb;
+}
+
+#borough-pane .scroll-pane .button{
+
+}

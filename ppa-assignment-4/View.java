@@ -1,3 +1,4 @@
+import javafx.animation.FillTransition;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -13,6 +14,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -21,6 +23,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.MenuBar;
 import javafx.scene.text.*;
+import javafx.util.Duration;
 
 import java.awt.*;
 import java.util.*;
@@ -54,7 +57,9 @@ public class View extends Application {
     private int panelIndex = 0;
 
     // The welcome page
-    private String welcomeParagraph = "This application shows information about all available airbnb properties in every london borough based on the given price range.\n\nHow to use:\n\nSelect a preferred price range. Click on a borough on the borough map to see its listings. Click on a property to view its details. Go to the statistics page to view the statistics of listings in the selected price range.\n\nSelected price range:\n";
+    private String welcomeParagraph = "This application shows information about all available airbnb properties in every london borough based on the given price range." +
+            "\n\nHow to use:\n\n1. Select a preferred price range. \n2. Click on a borough on the borough map to see its listings." +
+            "\n3. Click on a property to view its details. \n4. Go to the statistics page to view the statistics of listings in the selected price range.\n\nSelected price range:\n";
     private Label welcomePriceLabel;
     private Label welcomeText;
 
@@ -152,6 +157,7 @@ public class View extends Application {
      */
     private void initialiseApplicationWindow() {
         BorderPane topBar = new BorderPane();
+        topBar.setId("main-top");
         root.setTop(topBar);
 
         // Common padding parameter for HBoxes
@@ -310,16 +316,16 @@ public class View extends Application {
         welcomeTitleLabel.setId("welcome-title-label");
         welcomeTitleLabel.setWrapText(true);
 
-        Label welcomeArrowsLabel = new Label("Using the arrow keys in the top left corner you can traverse through the following pages in the app: \n\n1. Welcome page \n2. Map of boroughs with their listings \n3. Statistics on the current price range");
-        welcomeArrowsLabel.setWrapText(true);
-        welcomeArrowsLabel.getStyleClass().add("welcome-sides");
-        welcomeArrowsLabel.getStyleClass().add("welcome-label");
-        //welcomeArrowsLabel.setPrefWidth(200);
-
-        Label welcomeFilterLabel = new Label("To select a price range use the boxes in the top right corner");
-        welcomeFilterLabel.setWrapText(true);
-        welcomeFilterLabel.getStyleClass().add("welcome-sides");
-        welcomeFilterLabel.getStyleClass().add("welcome-label");
+//        Label welcomeArrowsLabel = new Label("Using the arrow keys in the top left corner you can traverse through the following pages in the app: \n\n1. Welcome page \n2. Map of boroughs with their listings \n3. Statistics on the current price range");
+//        welcomeArrowsLabel.setWrapText(true);
+//        welcomeArrowsLabel.getStyleClass().add("welcome-sides");
+//        welcomeArrowsLabel.getStyleClass().add("welcome-label");
+//        //welcomeArrowsLabel.setPrefWidth(200);
+//
+//        Label welcomeFilterLabel = new Label("To select a price range use the boxes in the top right corner");
+//        welcomeFilterLabel.setWrapText(true);
+//        welcomeFilterLabel.getStyleClass().add("welcome-sides");
+//        welcomeFilterLabel.getStyleClass().add("welcome-label");
 
 
         welcomeText = new Label(welcomeParagraph + "No price range selected");
@@ -333,11 +339,11 @@ public class View extends Application {
         BorderPane.setAlignment(welcomeText, Pos.CENTER);
         welcomePanel.setCenter(welcomeText);
 
-        BorderPane.setAlignment(welcomeArrowsLabel, Pos.CENTER);
-        welcomePanel.setLeft(welcomeArrowsLabel);
-
-        BorderPane.setAlignment(welcomeFilterLabel, Pos.CENTER);
-        welcomePanel.setRight(welcomeFilterLabel);
+//        BorderPane.setAlignment(welcomeArrowsLabel, Pos.CENTER);
+//        welcomePanel.setLeft(welcomeArrowsLabel);
+//
+//        BorderPane.setAlignment(welcomeFilterLabel, Pos.CENTER);
+//        welcomePanel.setRight(welcomeFilterLabel);
 
     }
 
@@ -417,8 +423,9 @@ public class View extends Application {
         mapPanel = new BorderPane();
         mapPanel.setId("map-panel");
         //Create a top label with a message in it
-        Label top = new Label("This the map of all the London boroughs and a relative " +
-                "comparison to number of available properties in each borough");
+        Label top = new Label("Map of London boroughs and relative availability of " +
+                "properties at each borough at the given price range.");
+        top.setId("map-label");
         //It will center the label in the center
         top.setMaxWidth(Double.MAX_VALUE);
         top.setAlignment(Pos.CENTER);
@@ -516,6 +523,7 @@ public class View extends Application {
 
         //Creating the new Border pane
         root2 = new BorderPane();
+        root2.setId("borough-pane");
 
         //Creating the top menu options
         makeMenuBar(boroughName);
@@ -526,7 +534,9 @@ public class View extends Application {
         root2.setCenter(scrollBar);
 
         //Creating the scene of the stage
-        secondaryStage.setScene(new Scene(root2, 0.6*screenSize.getWidth(), 0.6*screenSize.getHeight()));
+        Scene secondaryScene = new Scene(root2, 0.6*screenSize.getWidth(), 0.6*screenSize.getHeight());
+        secondaryScene.getStylesheets().add("main.css");
+        secondaryStage.setScene(secondaryScene);
         secondaryStage.show();
 
     }

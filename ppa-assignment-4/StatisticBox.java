@@ -43,6 +43,8 @@ public class StatisticBox extends BorderPane {
         double screenWidth = screenSize.getWidth();
         double screenHeight = screenSize.getHeight();
 
+        this.getStyleClass().add("statistic-cell");
+
         leftArrow = new Button("<");
         leftArrow.setPrefSize(0.04*screenWidth, 0.4*screenHeight);
         leftArrow.setAlignment(Pos.CENTER);

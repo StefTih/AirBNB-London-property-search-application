@@ -26,7 +26,7 @@ public class MapInfo {
     //Colour for absence of corresponding properties
     private static final String NO_PROPERTY = "-fx-background-color:#D0D0D0";
     //The size of the buttons in the property screen
-    private static final double PREF_WIDTH = 500;
+    private static final double PREF_WIDTH = 400;
 
     //The boroughs of London and their corresponding coordinates in the map.
     private String[][] LondonBoroughs;

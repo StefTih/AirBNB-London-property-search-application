@@ -71,7 +71,7 @@ public class View extends Application {
     private Statistic statNbOfEntireHomeApartments = new Statistic("Number of entire homes and apartments");
     private Statistic statMostExpensiveBorough = new Statistic("Most expensive borough");
     private Statistic statAvgPriceViewedProperties = new Statistic("Average price of all viewed properties");
-    private Statistic statMostSearchedExpression = new Statistic("Most searched expression (Property Search Panel)");
+    private Statistic statMostSearchedExpression = new Statistic("Most searched expression\n(Property Search Panel)");
     private Statistic statAvgNbOfPropertiesPerBorough = new Statistic("Average number of properties per borough");
     private Statistic statMinimumExpense = new Statistic("Minimum booking expense");
     // Collection of all Statistic objects
@@ -372,6 +372,9 @@ public class View extends Application {
 
     //Welcome window methods
 
+    /**
+     * Create JavaFX interface for the welcome page of the application
+     */
     private void initialiseWelcomePanel()
     {
         welcomePanel = new BorderPane();
@@ -379,7 +382,7 @@ public class View extends Application {
 
         VBox welcomeTopPane = new VBox();
         welcomeTopPane.setAlignment(Pos.CENTER);
-        welcomeTopPane.setSpacing(30);
+        welcomeTopPane.setSpacing(10);
 
         Label welcomeTitleLabel = new Label("Welcome to London Property Marketplace");
         welcomeTitleLabel.setId("welcome-title-label");
@@ -409,12 +412,12 @@ public class View extends Application {
 
         Label welcomePriceInfoLabel = new Label("Selected price range: ");
         welcomePriceInfoLabel.setWrapText(true);
-        welcomePriceInfoLabel.getStyleClass().addAll("welcome-label");
+        welcomePriceInfoLabel.getStyleClass().addAll("welcome-price");
         welcomePriceInfoLabel.setAlignment(Pos.TOP_CENTER);
 
         welcomePriceLabel = new Label("No price range selected");
         welcomePriceLabel.setWrapText(true);
-        welcomePriceLabel.getStyleClass().addAll("welcome-label");
+        welcomePriceLabel.getStyleClass().addAll("welcome-price");
         welcomePriceLabel.setAlignment(Pos.TOP_CENTER);
 
         welcomeBottomPane.getChildren().addAll(welcomePriceInfoLabel, welcomePriceLabel);
@@ -424,12 +427,16 @@ public class View extends Application {
         welcomePanel.setTop(welcomeTopPane);
 
         BorderPane.setAlignment(welcomeHowTo, Pos.CENTER);
-        welcomePanel.setCenter(welcomeHowTo);
+        welcomePanel.setBottom(welcomeHowTo);
 
-        BorderPane.setAlignment(welcomeBottomPane, Pos.TOP_CENTER);
-        welcomePanel.setBottom(welcomeBottomPane);
+        BorderPane.setAlignment(welcomeBottomPane, Pos.CENTER);
+        welcomePanel.setCenter(welcomeBottomPane);
     }
 
+    /**
+     * Update the label on the welcome page to display the price range selected by the user
+     * @param invalid true if the range selected by the user is invalid
+     */
     private void showPriceRange(boolean invalid)
     {
         if(invalid && fromPrice != null && toPrice != null){
@@ -989,14 +996,18 @@ public class View extends Application {
         // Create the panel as a SplitPane
         //Top pane is an HBox
         HBox searchBar = new HBox();
+        searchBar.setId("search-bar");
         searchBar.setAlignment(Pos.CENTER);
 
         //Bottom pane is another split pane but this time vertically
 
         propertyScroll = new ScrollPane();
+        propertyScroll.setId("results-scroll-pane");
+        propertyScroll.setPrefWidth(mapInfo.getPrefWidth() + 20);
         resultsPanel = new BorderPane();
         resultsPanel.setLeft(propertyScroll);
         searchEnginePanel = new SplitPane(searchBar, resultsPanel);
+        searchEnginePanel.setId("search-panel");
         searchEnginePanel.setOrientation(Orientation.VERTICAL);
         searchEnginePanel.setDividerPosition(0, 0.1);
 
@@ -1034,15 +1045,34 @@ public class View extends Application {
     }
 
     /**
-     * Checks whether the center pane of the border pane is filled with old info search before
-     * making a new search and removes the old search from the screen.
+     * Clear the right side of the screen to not display details of any property
      */
-    private void clearOldSearch()
+    private void clearSelectedProperty()
     {
         if(resultsPanel.getCenter() != null)
         {
             resultsPanel.setCenter(null);
         }
+    }
+
+    /**
+     * Clear the properties search result list on the left side of the screen
+     */
+    private void clearSearchResults()
+    {
+        if(propertyScroll.getContent() != null){
+            propertyScroll.setContent(null);
+        }
+    }
+
+    /**
+     * Checks whether the center pane of the border pane is filled with old info search before
+     * making a new search and removes the old search from the screen.
+     */
+    private void clearOldSearch()
+    {
+        clearSelectedProperty();
+        clearSearchResults();
     }
 
     /**
@@ -1144,23 +1174,40 @@ public class View extends Application {
 
         Insets vBoxPadding = new Insets(10, 10, 10, 10);
         vBox.setAlignment(Pos.TOP_CENTER);
-        ArrayList<Button> searchedResultsButtons = new ArrayList<>();
+        ToggleGroup propertiesToggleGroup = new ToggleGroup();
+        ArrayList<ToggleButton> searchedResultsButtons = new ArrayList<>();
 
         for (AirbnbListing property: searchResults) {
             System.out.println(property.getHost_name());
 
-            Button propertyInfo = new Button("Host of the property: "+property.getHost_name()
+            ToggleButton propertyInfo = new ToggleButton("Host of the property: "+property.getHost_name()
                     + "\nPrice: "+property.getPrice()
                     +"\nNumber of reviews: "+property.getNumberOfReviews()
                     +"\nMinimum number of nights that someone can stay: "+property.getMinimumNights());
+            propertyInfo.setToggleGroup(propertiesToggleGroup);
             propertyInfo.setPadding(vBoxPadding);
             propertyInfo.setPrefWidth(mapInfo.getPrefWidth());
             propertyInfo.setAlignment(Pos.BASELINE_LEFT);
-            propertyInfo.setOnAction(p ->showDetails(property));
+            propertyInfo.setOnAction(p ->propertyToggled(propertyInfo, property));
             searchedResultsButtons.add(propertyInfo);
         }
         vBox.getChildren().addAll(searchedResultsButtons);
         propertyScroll.setContent(vBox);
+    }
+
+    /**
+     * Toggle the information about the pressed property
+     * @param button the property that button was toggeled
+     * @param property the property linked to the button
+     */
+    private void propertyToggled(ToggleButton button, AirbnbListing property)
+    {
+        if(button.isSelected()){
+            showDetails(property);
+        }
+        else{
+            clearSelectedProperty();
+        }
     }
 
     /**

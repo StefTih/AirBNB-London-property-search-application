@@ -25,6 +25,8 @@ public class MapInfo {
     private static final String HIGH_VOL = "-fx-background-color:#55efc4";
     //Colour for absence of corresponding properties
     private static final String NO_PROPERTY = "-fx-background-color:#D0D0D0";
+    //The size of the buttons in the property screen
+    private static final double PREF_WIDTH = 500;
 
     //The boroughs of London and their corresponding coordinates in the map.
     private String[][] LondonBoroughs;
@@ -39,6 +41,15 @@ public class MapInfo {
     {
         LondonBoroughs = new String[NUM_BOROUGHS][INFO_INDEX];
         LondonAbbreviations = new HashMap<String,String>();
+    }
+
+    /**
+     * This method returns the preferred width of the button for the list of properties
+     * @return a double value with the width size of the buttons.
+     */
+    public double getPrefWidth()
+    {
+        return PREF_WIDTH;
     }
 
     /**

@@ -4,21 +4,20 @@
     -fx-font-family: "Arial";
 }
 
-#welcome-center{
-    -fx-border-radius: 20;
-}
-
 #welcome-title-label{
     -fx-font-size: 35;
     -fx-text-fill: #4997eb;
 }
 
-#welcome-info-label{
+.welcome-label{
     -fx-font-size: 17;
+    -fx-label-padding: 25;
 }
 
-.welcome-label{
-    -fx-label-padding: 25;
+.welcome-price {
+    -fx-font-size: 17;
+    -fx-label-padding: 10;
+    -fx-font-weight: bold;
 }
 
 #welcome-paragraph{
@@ -55,22 +54,22 @@
 
 }
 
-#main-top .combo-box{
+.combo-box{
     -fx-background-color: #ffffff;
     -fx-border-color: #000000;
     -fx-border-width: 1.5;
     -fx-border-radius: 3;
 }
 
-#main-top .combo-box:showing {
+.combo-box:showing {
     -fx-border-color: #4997eb;
 }
 
-#main-top .combo-box .list-cell:hover{
+.combo-box .list-cell:hover{
     -fx-background-color: #4997eb;
 }
 
-#main-top .combo-box .list-view .list-cell:selected{
+.combo-box .list-view .list-cell:selected{
     -fx-background-color: #4997eb;
 }
 
@@ -85,6 +84,10 @@
 #main-top .button:hover{
     -fx-background-color: #4997eb;
     -fx-text-fill: #ffffff;
+}
+
+#main-top .button:pressed{
+    -fx-background-color: #2b86e8;
 }
 
 #borough-pane{
@@ -114,9 +117,83 @@
 }
 
 #nav-bar{
-    -fx-padding: 9, 0, 0, 0;
+    -fx-padding: 8, 0, 0, 0;
+    -fx-font-size: 16;
 }
 
-#welcome-top{
-    -fx-alignment: center;
+#statistics-panel{
+    -fx-font-size: 15;
+    -fx-background-color: #ffffff;
+}
+
+#statistics-panel .label{
+    -fx-label-padding: 5;
+    -fx-pref-height: 100;
+}
+
+#statistics-panel .button{
+    -fx-background-color: #ffffff;
+    -fx-border-color: #b2bec3;
+    -fx-border-radius: 5;
+}
+
+#statistics-panel .button:hover{
+    -fx-background-color: #dfe6e9;
+    /*-fx-text-fill: #4997eb;*/
+}
+
+#statistics-panel .button:pressed{
+    -fx-background-color: #d2dce0;
+}
+
+.statistic-cell{
+    -fx-border-color: #000000;
+    -fx-padding: 20;
+    -fx-border-radius: 7;
+    -fx-border-width: 2;
+}
+
+#search-panel{
+    -fx-background-color: #ffffff;
+}
+
+#search-bar{
+    -fx-spacing: 10;
+    -fx-font-family: "Arial";
+}
+
+#search-bar .button{
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #000000;
+    -fx-border-color: #000000;
+    -fx-border-radius: 5;
+}
+
+#search-bar .button:hover{
+    -fx-background-color: #4997eb;
+    -fx-text-fill: #ffffff;
+    -fx-border-color: #4997eb;
+}
+
+#search-bar .text-field:focused{
+    -fx-border-color: #4997eb;
+}
+
+#results-scroll-pane .toggle-button{
+    -fx-background-color: #ffffff;
+    -fx-border-color: #4997eb;
+    -fx-border-width: 1, 0, 1, 0;
+}
+
+#results-scroll-pane .toggle-button:hover{
+    -fx-background-color: #eaf3fd;
+}
+
+#results-scroll-pane .toggle-button:pressed{
+    -fx-background-color: #68a9ee;
+}
+
+#results-scroll-pane .toggle-button:selected{
+    -fx-text-fill: #ffffff;
+    -fx-background-color: #6cabef;
 }

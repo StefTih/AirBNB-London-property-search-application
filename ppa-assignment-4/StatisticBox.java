@@ -4,6 +4,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 
 import javafx.event.ActionEvent;
+import javafx.scene.text.TextAlignment;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -42,6 +43,8 @@ public class StatisticBox extends BorderPane {
         double screenWidth = screenSize.getWidth();
         double screenHeight = screenSize.getHeight();
 
+        this.getStyleClass().add("statistic-cell");
+
         leftArrow = new Button("<");
         leftArrow.setPrefSize(0.04*screenWidth, 0.4*screenHeight);
         leftArrow.setAlignment(Pos.CENTER);
@@ -59,10 +62,14 @@ public class StatisticBox extends BorderPane {
         setCenter(statistic);
 
         statisticName = new Label("Statistic Name");
+        statisticName.setWrapText(true);
+        statisticName.setTextAlignment(TextAlignment.CENTER);
         BorderPane.setAlignment(statisticName, Pos.CENTER);
         statistic.setTop(statisticName);
 
         statisticValue = new Label("Statistic Value");
+        statisticValue.setWrapText(true);
+        statisticValue.setTextAlignment(TextAlignment.CENTER);
         statistic.setCenter(statisticValue);
 
     }

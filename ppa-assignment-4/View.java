@@ -49,7 +49,6 @@ public class View extends Application {
     private ComboBox toComboBox;
     private Integer fromPrice;
     private Integer toPrice;
-    private Label panelName;
 
     private ArrayList<Parent> centerPanels;
     private ArrayList<NamedPanel> namedPanels;
@@ -96,7 +95,7 @@ public class View extends Application {
     //Stores the buttons that represent the neighbourhoods on the map
     private ArrayList<Button> mapButtons;
     //Stores the buttons that represent the properties in each neighbourhood
-    private ArrayList<Button> propertyButtons;
+    private ArrayList<ToggleButton> propertyButtons;
 
     //A border pane to separate the properties from their info graphic.
     private BorderPane resultsPanel;
@@ -106,6 +105,8 @@ public class View extends Application {
     TextField searchField;
     //DropDown List of boroughs
     ComboBox<String> boroughsComboBox;
+    //Currently chosen borough
+    String selectedBorough = null;
 
 
     /**
@@ -272,6 +273,9 @@ public class View extends Application {
         enableButtons(invalidRange); // Enable or Disable the navigation between panels depending on the validity of the selected price range
         if (! invalidRange) {
             computeProperties(); // Collect the proprieties that correspond to the selected price range
+            if (root.getCenter() == searchEnginePanel && propertyScroll.getContent() != null && ! searchField.getCharacters().toString().trim().equals("")) {
+                search(null, false);
+            }
         }
         showPriceRange(invalidRange); // Show the price range in the Welcome Panel
     }
@@ -729,14 +733,7 @@ public class View extends Application {
 
         for(AirbnbListing propertyInfo: mapInfo.getPropertyList(boroughName))
         {
-
-            Button property = new Button("Host of the property: "+propertyInfo.getHost_name()
-                    + "\nPrice: "+propertyInfo.getPrice()
-                    +"\nNumber of reviews: "+propertyInfo.getNumberOfReviews()
-                    +"\nMinimum number of nights that someone can stay: "+propertyInfo.getMinimumNights());
-            property.setPadding(vBoxPadding);
-            property.setPrefWidth(mapInfo.getPrefWidth());
-            property.setAlignment(Pos.BASELINE_LEFT);
+            ToggleButton property = new PropertyButton(propertyInfo, mapInfo);
             propertyButtons.add(property);
             property.setOnAction(p ->showDescription(propertyInfo));
         }
@@ -1013,13 +1010,14 @@ public class View extends Application {
 
         boroughsComboBox = new ComboBox<>();
         boroughsComboBox.setPromptText("ALL BOROUGHS");
+        boroughsComboBox.setOnAction(this::boroughChanged);
         fillBoroughsComboBox();
         searchField = new TextField();
         searchField.setPromptText("Property name");
         searchField.setPrefWidth(300);
         searchField.setOnKeyPressed(this::searchKeyPressed);
         Button searchButton = new Button("SEARCH");
-        searchButton.setOnAction(this::search);
+        searchButton.setOnAction(event -> search(event, true));
         searchBar.getChildren().addAll(boroughsComboBox, searchField, searchButton);
     }
 
@@ -1035,12 +1033,29 @@ public class View extends Application {
     }
 
     /**
+     * This method is triggered when a user choses a borough from the DropDown List.
+     * It triggers an update of the search results with the new borough as a parameter.
+     * @param event The ActionEvent triggered by the user
+     */
+    private void boroughChanged(ActionEvent event) {
+        String newSelectedBorough = boroughsComboBox.getSelectionModel().getSelectedItem();
+        if (! newSelectedBorough.equals(selectedBorough)) {
+            selectedBorough = newSelectedBorough;
+            Node center = root.getCenter();
+            String characters = searchField.getCharacters().toString().trim();
+            if (root.getCenter() == searchEnginePanel && propertyScroll.getContent() != null && !searchField.getCharacters().toString().trim().equals("")) {
+                search(null, false);
+            }
+        }
+    }
+
+    /**
      * Search for properties if the user presses the Enter key while writing in the Search Text Field.
      * @param event The KeyEvent triggered by the user
      */
     private void searchKeyPressed(KeyEvent event) {
         if (event.getCode().equals(KeyCode.ENTER)) {
-            search(null);
+            search(null, true);
         }
     }
 
@@ -1079,12 +1094,11 @@ public class View extends Application {
      * Search for properties according to the prefix specified in the Text Field.
      * @param event The ActionEvent triggered by the user
      */
-    private void search(ActionEvent event) {
+    private void search(ActionEvent event, boolean storeExpression) {
         clearOldSearch();
-        if (! (searchField.getCharacters().isEmpty() || invalidPriceRange())) {
+        if (! (searchField.getCharacters().toString().trim().equals("") || invalidPriceRange())) {
             // Search for properties within the selected price range and corresponding with the search prefix
             String searchWord = searchField.getCharacters().toString().trim().toLowerCase();
-            String selectedBorough = boroughsComboBox.getSelectionModel().getSelectedItem();
             List<AirbnbListing> searchResults =  properties.stream().filter(p -> p.getName().toLowerCase().contains(searchWord)).collect(Collectors.toList());
             if (selectedBorough != null && (! selectedBorough.equals("ALL BOROUGHS"))) {
                 searchResults = searchResults.stream().filter(p -> p.getNeighbourhood().equals(selectedBorough)).collect(Collectors.toList());
@@ -1096,7 +1110,11 @@ public class View extends Application {
 
             showSearchResults(searchResults);
 
-            appendSearchWordToFile(searchWord);
+            // Only store the expression within the list of searched expressions if the search is initiated
+            // by the user (not by an update from a price range or borough change)
+            if (storeExpression) {
+                appendSearchWordToFile(searchWord);
+            }
 
         } else if (searchField.getCharacters().isEmpty()) {
             showEmptyFieldAlert();
@@ -1178,16 +1196,8 @@ public class View extends Application {
         ArrayList<ToggleButton> searchedResultsButtons = new ArrayList<>();
 
         for (AirbnbListing property: searchResults) {
-            System.out.println(property.getHost_name());
-
-            ToggleButton propertyInfo = new ToggleButton("Host of the property: "+property.getHost_name()
-                    + "\nPrice: "+property.getPrice()
-                    +"\nNumber of reviews: "+property.getNumberOfReviews()
-                    +"\nMinimum number of nights that someone can stay: "+property.getMinimumNights());
+            ToggleButton propertyInfo = new PropertyButton(property, mapInfo);
             propertyInfo.setToggleGroup(propertiesToggleGroup);
-            propertyInfo.setPadding(vBoxPadding);
-            propertyInfo.setPrefWidth(mapInfo.getPrefWidth());
-            propertyInfo.setAlignment(Pos.BASELINE_LEFT);
             propertyInfo.setOnAction(p ->propertyToggled(propertyInfo, property));
             searchedResultsButtons.add(propertyInfo);
         }

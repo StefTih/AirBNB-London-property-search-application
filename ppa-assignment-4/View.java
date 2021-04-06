@@ -63,8 +63,7 @@ public class View extends Application {
     //private HashMap<Parent, Label> panelNames = new HashMap<>();
 
     // The welcome page
-    private String welcomeParagraph = "This application shows information about all available airbnb properties in every london borough based on the given price range." +
-            "\n\nHow to use:\n\n1. Select a preferred price range. \n2. Click on a borough on the borough map to see its listings." +
+    private String welcomeParagraph = "How to use:\n\n1. Select a preferred price range. \n2. Click on a borough on the borough map to see its listings." +
             "\n3. Click on a property to view its details. \n4. Go to the statistics page to view the statistics of listings in the selected price range.\n\nSelected price range:\n";
     private Label welcomePriceLabel;
     private Label welcomeText;
@@ -217,8 +216,6 @@ public class View extends Application {
         activePanels.setPadding(new Insets(0, 20, 0, 20));
         BorderPane.setAlignment(activePanels, Pos.BOTTOM_LEFT);
         topBar.setCenter(activePanels);
-
-
     }
 
     /**
@@ -400,8 +397,20 @@ public class View extends Application {
         welcomeText.getStyleClass().add("welcome-label");
         welcomeText.setId("welcome-paragraph");
 
-        BorderPane.setAlignment(welcomeTitleLabel, Pos.CENTER);
-        welcomePanel.setTop(welcomeTitleLabel);
+        Label welcomeInfoLabel = new Label("This application shows information about all available airbnb properties in every london borough based on the given price range.");
+        welcomeInfoLabel.setId("welcome-info-label");
+        welcomeInfoLabel.setWrapText(true);
+
+        welcomeInfoLabel.setAlignment(Pos.CENTER);
+        welcomeTitleLabel.setAlignment(Pos.CENTER);
+
+        VBox welcomeTopPane = new VBox();
+        welcomeTopPane.setAlignment(Pos.CENTER);
+        welcomeTopPane.setSpacing(30);
+        welcomeTopPane.getChildren().addAll(welcomeTitleLabel, welcomeInfoLabel);
+
+        BorderPane.setAlignment(welcomeTopPane, Pos.CENTER);
+        welcomePanel.setTop(welcomeTopPane);
 
         BorderPane.setAlignment(welcomeText, Pos.CENTER);
         welcomePanel.setCenter(welcomeText);

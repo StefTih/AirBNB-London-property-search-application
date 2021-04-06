@@ -9,14 +9,12 @@
 }
 
 #welcome-title-label{
-    -fx-font-size: 25;
+    -fx-font-size: 35;
+    -fx-text-fill: #4997eb;
 }
 
-.welcome-sides{
-    -fx-pref-width: 250;
-    -fx-font-size: 15;
-    -fx-text-fill: #4997eb;
-
+#welcome-info-label{
+    -fx-font-size: 17;
 }
 
 .welcome-label{
@@ -117,4 +115,8 @@
 
 #nav-bar{
     -fx-padding: 9, 0, 0, 0;
+}
+
+#welcome-top{
+    -fx-alignment: center;
 }

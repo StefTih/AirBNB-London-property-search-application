@@ -726,7 +726,6 @@ public class View extends Application {
     {
         VBox vBox = new VBox();
 
-        Insets vBoxPadding = new Insets(10, 10, 10, 10);
         vBox.setAlignment(Pos.TOP_CENTER);
         propertyButtons = new ArrayList<>();
 
@@ -1099,11 +1098,20 @@ public class View extends Application {
         if (! (searchField.getCharacters().toString().trim().equals("") || invalidPriceRange())) {
             // Search for properties within the selected price range and corresponding with the search prefix
             String searchWord = searchField.getCharacters().toString().trim().toLowerCase();
-            List<AirbnbListing> searchResults =  properties.stream().filter(p -> p.getName().toLowerCase().contains(searchWord)).collect(Collectors.toList());
+
+            // Properties whose name EQUALS the searched expression (order of pertinance)
+            List<AirbnbListing> searchResults =  properties.stream().filter(p -> p.getName().toLowerCase().equals(searchWord)).collect(Collectors.toList());
+            // Properties whose name STARTSWITH the searched expression
+            properties.stream().filter(p -> p.getName().toLowerCase().startsWith(searchWord) && !(p.getName().toLowerCase().equals(searchWord))).forEach(searchResults::add);
+            // Properties whose name CONTAINS the searched expression
+            properties.stream().filter(p -> p.getName().toLowerCase().contains(searchWord) && !(p.getName().toLowerCase().startsWith(searchWord))).forEach(searchResults::add);
+
+            // If a specific borough is selected
             if (selectedBorough != null && (! selectedBorough.equals("ALL BOROUGHS"))) {
                 searchResults = searchResults.stream().filter(p -> p.getNeighbourhood().equals(selectedBorough)).collect(Collectors.toList());
             }
 
+            // Show an Alert Dialog if the search finds no corresponding properties
             if (searchResults.isEmpty()) {
                 showEmptyResultsAlert();
             }
@@ -1190,11 +1198,11 @@ public class View extends Application {
     {
         VBox vBox = new VBox();
 
-        Insets vBoxPadding = new Insets(10, 10, 10, 10);
         vBox.setAlignment(Pos.TOP_CENTER);
         ToggleGroup propertiesToggleGroup = new ToggleGroup();
         ArrayList<ToggleButton> searchedResultsButtons = new ArrayList<>();
 
+        // Create buttons to display the search results
         for (AirbnbListing property: searchResults) {
             ToggleButton propertyInfo = new PropertyButton(property, mapInfo);
             propertyInfo.setToggleGroup(propertiesToggleGroup);

@@ -95,7 +95,7 @@ public class View extends Application {
     //Stores the buttons that represent the neighbourhoods on the map
     private ArrayList<Button> mapButtons;
     //Stores the buttons that represent the properties in each neighbourhood
-    private ArrayList<Button> propertyButtons;
+    private ArrayList<ToggleButton> propertyButtons;
 
     //A border pane to separate the properties from their info graphic.
     private BorderPane resultsPanel;
@@ -733,14 +733,7 @@ public class View extends Application {
 
         for(AirbnbListing propertyInfo: mapInfo.getPropertyList(boroughName))
         {
-
-            Button property = new Button("Host of the property: "+propertyInfo.getHost_name()
-                    + "\nPrice: "+propertyInfo.getPrice()
-                    +"\nNumber of reviews: "+propertyInfo.getNumberOfReviews()
-                    +"\nMinimum number of nights that someone can stay: "+propertyInfo.getMinimumNights());
-            property.setPadding(vBoxPadding);
-            property.setPrefWidth(mapInfo.getPrefWidth());
-            property.setAlignment(Pos.BASELINE_LEFT);
+            ToggleButton property = new PropertyButton(propertyInfo, mapInfo);
             propertyButtons.add(property);
             property.setOnAction(p ->showDescription(propertyInfo));
         }
@@ -1203,14 +1196,8 @@ public class View extends Application {
         ArrayList<ToggleButton> searchedResultsButtons = new ArrayList<>();
 
         for (AirbnbListing property: searchResults) {
-            ToggleButton propertyInfo = new ToggleButton("Host of the property: "+property.getHost_name()
-                    + "\nPrice: "+property.getPrice()
-                    +"\nNumber of reviews: "+property.getNumberOfReviews()
-                    +"\nMinimum number of nights that someone can stay: "+property.getMinimumNights());
+            ToggleButton propertyInfo = new PropertyButton(property, mapInfo);
             propertyInfo.setToggleGroup(propertiesToggleGroup);
-            propertyInfo.setPadding(vBoxPadding);
-            propertyInfo.setPrefWidth(mapInfo.getPrefWidth());
-            propertyInfo.setAlignment(Pos.BASELINE_LEFT);
             propertyInfo.setOnAction(p ->propertyToggled(propertyInfo, property));
             searchedResultsButtons.add(propertyInfo);
         }

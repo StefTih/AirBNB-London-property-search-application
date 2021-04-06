@@ -96,6 +96,10 @@ public class View extends Application {
     //Stores the buttons that represent the properties in each neighbourhood
     private ArrayList<Button> propertyButtons;
 
+    //A border pane to separate the properties from their info graphic.
+    private BorderPane resultsPanel;
+    //A scrollbar for the search engine panel for each neighbourhood
+    private ScrollPane propertyScroll;
     //Text field for user to search properties
     TextField searchField;
     //DropDown List of boroughs
@@ -670,6 +674,8 @@ public class View extends Application {
                     +"\nNumber of reviews: "+propertyInfo.getNumberOfReviews()
                     +"\nMinimum number of nights that someone can stay: "+propertyInfo.getMinimumNights());
             property.setPadding(vBoxPadding);
+            property.setPrefWidth(mapInfo.getPrefWidth());
+            property.setAlignment(Pos.BASELINE_LEFT);
             propertyButtons.add(property);
             property.setOnAction(p ->showDescription(propertyInfo));
         }
@@ -926,9 +932,15 @@ public class View extends Application {
     private void initialiseSearchEnginePanel()
     {
         // Create the panel as a SplitPane
+        //Top pane is an HBox
         HBox searchBar = new HBox();
         searchBar.setAlignment(Pos.CENTER);
-        ScrollPane resultsPanel = new ScrollPane();
+
+        //Bottom pane is another split pane but this time vertically
+
+        propertyScroll = new ScrollPane();
+        resultsPanel = new BorderPane();
+        resultsPanel.setLeft(propertyScroll);
         searchEnginePanel = new SplitPane(searchBar, resultsPanel);
         searchEnginePanel.setOrientation(Orientation.VERTICAL);
         searchEnginePanel.setDividerPosition(0, 0.1);
@@ -967,10 +979,23 @@ public class View extends Application {
     }
 
     /**
+     * Checks whether the center pane of the border pane is filled with old info search before
+     * making a new search and removes the old search from the screen.
+     */
+    private void clearOldSearch()
+    {
+        if(resultsPanel.getCenter() != null)
+        {
+            resultsPanel.setCenter(null);
+        }
+    }
+
+    /**
      * Search for properties according to the prefix specified in the Text Field.
      * @param event The ActionEvent triggered by the user
      */
     private void search(ActionEvent event) {
+        clearOldSearch();
         if (! (searchField.getCharacters().isEmpty() || invalidPriceRange())) {
             // Search for properties within the selected price range and corresponding with the search prefix
             String searchWord = searchField.getCharacters().toString().trim().toLowerCase();
@@ -1060,11 +1085,43 @@ public class View extends Application {
      */
     private void showSearchResults(List<AirbnbListing> searchResults)
     {
+        VBox vBox = new VBox();
+
+        Insets vBoxPadding = new Insets(10, 10, 10, 10);
+        vBox.setAlignment(Pos.TOP_CENTER);
+        ArrayList<Button> searchedResultsButtons = new ArrayList<>();
+
         for (AirbnbListing property: searchResults) {
-            System.out.println(property.getName() + " - " + property.getNeighbourhood());
+            System.out.println(property.getHost_name());
+
+            Button propertyInfo = new Button("Host of the property: "+property.getHost_name()
+                    + "\nPrice: "+property.getPrice()
+                    +"\nNumber of reviews: "+property.getNumberOfReviews()
+                    +"\nMinimum number of nights that someone can stay: "+property.getMinimumNights());
+            propertyInfo.setPadding(vBoxPadding);
+            propertyInfo.setPrefWidth(mapInfo.getPrefWidth());
+            propertyInfo.setAlignment(Pos.BASELINE_LEFT);
+            propertyInfo.setOnAction(p ->showDetails(property));
+            searchedResultsButtons.add(propertyInfo);
         }
+        vBox.getChildren().addAll(searchedResultsButtons);
+        propertyScroll.setContent(vBox);
     }
 
+    /**
+     * This method finds all the details regarding the property searched and outputs them onto
+     * the center of the border pane
+     * @param property stores the object of type AirbnbListing which contains all the
+     *                 details about this specific property.
+     */
+    private void showDetails(AirbnbListing property)
+    {
+        Label propertyDescription = new Label(mapInfo.showPropertyDescription(property.getId()));
+        resultsPanel.setCenter(propertyDescription);
+
+        viewedProperties.put(property.getId(), property);
+        computeAvgPriceViewedProperties();
+    }
 
     /**
      * Show an Alert Dialog to state that the Search has found no properties has a result.

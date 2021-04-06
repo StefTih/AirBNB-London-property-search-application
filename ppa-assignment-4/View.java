@@ -70,13 +70,17 @@ public class View extends Application {
     private Statistic statMostExpensiveBorough = new Statistic("Most expensive borough");
     private Statistic statAvgPriceViewedProperties = new Statistic("Average price of all viewed properties");
     private Statistic statMostSearchedExpression = new Statistic("Most searched expression (Property Search Panel)");
-    // ADD 3 ADDITIONAL STATISTICS
+    private Statistic statAvgNbOfPropertiesPerBorough = new Statistic("Average number of properties per borough");
+    private Statistic statMinimumExpense = new Statistic("Minimum booking expense");
+    // Collection of all Statistic objects
     private ArrayList<Statistic> statistics = new ArrayList<>(Arrays.asList(
-            statAvgReviews, statNbOfProperties, statNbOfEntireHomeApartments, statMostExpensiveBorough, statAvgPriceViewedProperties, statMostSearchedExpression
+            statAvgReviews, statNbOfProperties, statNbOfEntireHomeApartments, statMostExpensiveBorough, statAvgPriceViewedProperties, statMostSearchedExpression, statAvgNbOfPropertiesPerBorough, statMinimumExpense
     ));
 
     // Collection of viewed properties
     private HashMap<String, AirbnbListing> viewedProperties = new HashMap<>();
+    // Collection of London boroughs (and their index on the map)
+    private String[][] londonBoroughs;
 
     // Collection of all 4 "Statistic Boxes"
     private ArrayList<StatisticBox> statisticBoxes;
@@ -309,6 +313,7 @@ public class View extends Application {
         root.setCenter(panel);
         panelName.setText(panelNames.get(panel));
         if (panel == statisticsPanel) {
+            computeStatistics();
             computeMostSearchedExpression();
         }
     }
@@ -427,6 +432,8 @@ public class View extends Application {
 
 
         linkAbbreviations();
+
+        londonBoroughs = mapInfo.getLondonBoroughs();
 
     }
 
@@ -792,6 +799,21 @@ public class View extends Application {
 
         // Compute most expensive borough
         statMostExpensiveBorough.setValue(mostExpensiveBorough());
+
+        // Compute average number of properties per borough
+        statAvgNbOfPropertiesPerBorough.setValue(String.valueOf(properties.size()/londonBoroughs.length));
+
+        // Compute minimum booking expense (price to pay to book the cheapest property
+        AirbnbListing cheapestProperty = properties.get(0);
+        int cheapestPrice = cheapestProperty.getPrice() * cheapestProperty.getMinimumNights();
+        for (AirbnbListing property: properties) {
+            int price = property.getPrice() * property.getMinimumNights();
+            if (price < cheapestPrice) {
+                cheapestProperty = property;
+                cheapestPrice = price;
+            }
+        }
+        statMinimumExpense.setValue("£" + cheapestPrice + " (" + cheapestProperty.getName() + ", " + cheapestProperty.getNeighbourhood() + ")");
 
         // Update the statistic value shown in each "Statistic Box"
         updateStatistics();

@@ -63,10 +63,7 @@ public class View extends Application {
     //private HashMap<Parent, Label> panelNames = new HashMap<>();
 
     // The welcome page
-    private String welcomeParagraph = "How to use:\n\n1. Select a preferred price range. \n2. Click on a borough on the borough map to see its listings." +
-            "\n3. Click on a property to view its details. \n4. Go to the statistics page to view the statistics of listings in the selected price range.\n\nSelected price range:\n";
     private Label welcomePriceLabel;
-    private Label welcomeText;
 
     // The statistics
     private Statistic statAvgReviews = new Statistic("Average number of reviews per property");
@@ -380,60 +377,66 @@ public class View extends Application {
         welcomePanel = new BorderPane();
         welcomePanel.setId("welcome-panel");
 
-        Label welcomeTitleLabel = new Label("Welcome to London Property Marketplace");
-        welcomeTitleLabel.setId("welcome-title-label");
-        welcomeTitleLabel.setWrapText(true);
-
-//        Label welcomeArrowsLabel = new Label("Using the arrow keys in the top left corner you can traverse through the following pages in the app: \n\n1. Welcome page \n2. Map of boroughs with their listings \n3. Statistics on the current price range");
-//        welcomeArrowsLabel.setWrapText(true);
-//        welcomeArrowsLabel.getStyleClass().add("welcome-sides");
-//        welcomeArrowsLabel.getStyleClass().add("welcome-label");
-//        //welcomeArrowsLabel.setPrefWidth(200);
-//
-//        Label welcomeFilterLabel = new Label("To select a price range use the boxes in the top right corner");
-//        welcomeFilterLabel.setWrapText(true);
-//        welcomeFilterLabel.getStyleClass().add("welcome-sides");
-//        welcomeFilterLabel.getStyleClass().add("welcome-label");
-
-
-        welcomeText = new Label(welcomeParagraph + "No price range selected");
-        welcomeText.setWrapText(true);
-        welcomeText.getStyleClass().add("welcome-label");
-        welcomeText.setId("welcome-paragraph");
-
-        Label welcomeInfoLabel = new Label("This application shows information about all available airbnb properties in every london borough based on the given price range.");
-        welcomeInfoLabel.setId("welcome-info-label");
-        welcomeInfoLabel.setWrapText(true);
-
-        welcomeInfoLabel.setAlignment(Pos.CENTER);
-        welcomeTitleLabel.setAlignment(Pos.CENTER);
-
         VBox welcomeTopPane = new VBox();
         welcomeTopPane.setAlignment(Pos.CENTER);
         welcomeTopPane.setSpacing(30);
+
+        Label welcomeTitleLabel = new Label("Welcome to London Property Marketplace");
+        welcomeTitleLabel.setId("welcome-title-label");
+        welcomeTitleLabel.setWrapText(true);
+        welcomeTitleLabel.setAlignment(Pos.CENTER);
+
+        Label welcomeInfoLabel = new Label("This application shows information about all available " +
+                "airbnb properties in every london borough based on the given price range.");
+        welcomeInfoLabel.getStyleClass().add("welcome-label");
+        welcomeInfoLabel.setWrapText(true);
+        welcomeInfoLabel.setAlignment(Pos.CENTER);
+
         welcomeTopPane.getChildren().addAll(welcomeTitleLabel, welcomeInfoLabel);
+
+        Label welcomeHowTo = new Label("How to use:\n\n1. Select a preferred price range." +
+                "\n2. Click on a borough on the borough map to see its listings." +
+                "\n3. Click on a property to view its details. " +
+                "\n4. Go to the statistics page to view the statistics of listings in the selected price range.");
+        welcomeHowTo.setWrapText(true);
+        welcomeHowTo.getStyleClass().add("welcome-label");
+        welcomeHowTo.setId("welcome-paragraph");
+        welcomeHowTo.setAlignment(Pos.CENTER);
+
+        VBox welcomeBottomPane = new VBox();
+        welcomeBottomPane.setId("welcome-bottom");
+        welcomeBottomPane.setAlignment(Pos.CENTER);
+
+        Label welcomePriceInfoLabel = new Label("Selected price range: ");
+        welcomePriceInfoLabel.setWrapText(true);
+        welcomePriceInfoLabel.getStyleClass().addAll("welcome-label");
+        welcomePriceInfoLabel.setAlignment(Pos.TOP_CENTER);
+
+        welcomePriceLabel = new Label("No price range selected");
+        welcomePriceLabel.setWrapText(true);
+        welcomePriceLabel.getStyleClass().addAll("welcome-label");
+        welcomePriceLabel.setAlignment(Pos.TOP_CENTER);
+
+        welcomeBottomPane.getChildren().addAll(welcomePriceInfoLabel, welcomePriceLabel);
+
 
         BorderPane.setAlignment(welcomeTopPane, Pos.CENTER);
         welcomePanel.setTop(welcomeTopPane);
 
-        BorderPane.setAlignment(welcomeText, Pos.CENTER);
-        welcomePanel.setCenter(welcomeText);
+        BorderPane.setAlignment(welcomeHowTo, Pos.CENTER);
+        welcomePanel.setCenter(welcomeHowTo);
 
-//        BorderPane.setAlignment(welcomeArrowsLabel, Pos.CENTER);
-//        welcomePanel.setLeft(welcomeArrowsLabel);
-//
-//        BorderPane.setAlignment(welcomeFilterLabel, Pos.CENTER);
-//        welcomePanel.setRight(welcomeFilterLabel);
-
+        BorderPane.setAlignment(welcomeBottomPane, Pos.TOP_CENTER);
+        welcomePanel.setBottom(welcomeBottomPane);
     }
 
     private void showPriceRange(boolean invalid)
     {
         if(invalid && fromPrice != null && toPrice != null){
-            welcomeText.setText(welcomeParagraph + "Invalid");
+            welcomePriceLabel.setText("Invalid");
         }
         else if(fromPrice != null && toPrice != null){
-            welcomeText.setText(welcomeParagraph + "\u00A3" + fromPrice + " - \u00A3" + toPrice);
+            welcomePriceLabel.setText("\u00A3" + fromPrice + " - \u00A3" + toPrice);
         }
     }
 

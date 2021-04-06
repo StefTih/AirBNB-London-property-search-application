@@ -4,20 +4,13 @@
     -fx-font-family: "Arial";
 }
 
-#welcome-center{
-    -fx-border-radius: 20;
-}
-
 #welcome-title-label{
     -fx-font-size: 35;
     -fx-text-fill: #4997eb;
 }
 
-#welcome-info-label{
-    -fx-font-size: 17;
-}
-
 .welcome-label{
+    -fx-font-size: 17;
     -fx-label-padding: 25;
 }
 
@@ -117,6 +110,3 @@
     -fx-padding: 9, 0, 0, 0;
 }
 
-#welcome-top{
-    -fx-alignment: center;
-}

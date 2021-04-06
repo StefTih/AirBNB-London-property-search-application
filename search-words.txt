@@ -27,3 +27,5 @@ nic
 nic
 nic
 nic
+house
+furnished

@@ -227,7 +227,7 @@ public class View extends Application {
         int count = 0;
         for(NamedPanel panel : namedPanels){
             if(count++ > 0){
-                pane.getChildren().add(new Label("/"));
+                pane.getChildren().add(new Label("|"));
             }
             pane.getChildren().add(panel.getLabel());
         }
@@ -805,7 +805,8 @@ public class View extends Application {
     private void initialiseStatisticsPanel() {
         // Create the panel as a 2x2 grid
         statisticsPanel = new GridPane();
-        statisticsPanel.setPadding(new Insets(10,10,10,10));
+        statisticsPanel.setId("statistics-panel");
+        statisticsPanel.setPadding(new Insets(45,45,45,45));
         statisticsPanel.setHgap(50);
         statisticsPanel.setVgap(50);
         ColumnConstraints columnConstraints = new ColumnConstraints();

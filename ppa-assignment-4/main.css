@@ -80,6 +80,10 @@
     -fx-text-fill: #ffffff;
 }
 
+#main-top .button:pressed{
+    -fx-background-color: #2b86e8;
+}
+
 #borough-pane{
     -fx-background-color: #ffffff;
 }
@@ -107,6 +111,30 @@
 }
 
 #nav-bar{
-    -fx-padding: 9, 0, 0, 0;
+    -fx-padding: 8, 0, 0, 0;
+    -fx-font-size: 16;
 }
 
+#statistics-panel{
+    -fx-font-size: 15;
+    -fx-background-color: #ffffff;
+}
+
+#statistics-panel .label{
+    -fx-label-padding: 15;
+}
+
+#statistics-panel .button{
+    -fx-background-color: #ffffff;
+    -fx-border-color: #b2bec3;
+    -fx-border-radius: 5;
+}
+
+#statistics-panel .button:hover{
+    -fx-background-color: #dfe6e9;
+    /*-fx-text-fill: #4997eb;*/
+}
+
+#statistics-panel .button:pressed{
+    -fx-background-color: #d2dce0;
+}

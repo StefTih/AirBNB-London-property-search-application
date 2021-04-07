@@ -628,20 +628,21 @@ public class View extends Application {
 
             //Creating the new Border pane
             root2 = new BorderPane();
-        root2.setId("borough-pane");
+            root2.setId("borough-pane");
 
             //Creating the top menu options
             makeMenuBar(boroughName);
 
             //Creating the scrollbar and setting it to the center of the pane
             scrollBar = new ScrollPane();
+            scrollBar.setPrefWidth(mapInfo.getPrefWidth() + 20);
             scrollBar.setContent(addPropertyInfo(boroughName));
-            root2.setCenter(scrollBar);
+            root2.setLeft(scrollBar);
 
             //Creating the scene of the stage
             Scene secondaryScene = new Scene(root2, 0.6*screenSize.getWidth(), 0.6*screenSize.getHeight());
-        secondaryScene.getStylesheets().add("main.css");
-        secondaryStage.setScene(secondaryScene);
+            secondaryScene.getStylesheets().add("main.css");
+            secondaryStage.setScene(secondaryScene);
             secondaryStage.show();
         } else {
             // Show an Alert Dialog
@@ -730,17 +731,32 @@ public class View extends Application {
 
         vBox.setAlignment(Pos.TOP_CENTER);
         propertyButtons = new ArrayList<>();
-
+        ToggleGroup propertiesToggleGroup = new ToggleGroup();
 
         for(AirbnbListing propertyInfo: mapInfo.getPropertyList(boroughName))
         {
-            ToggleButton property = new PropertyButton(propertyInfo, mapInfo);
+            ToggleButton property = new PropertyButton(propertyInfo, mapInfo, propertiesToggleGroup);
             propertyButtons.add(property);
-            property.setOnAction(p ->showDescription(propertyInfo));
+            property.setOnAction(p -> boroughPropertyToggled(property, propertyInfo));
         }
 
         vBox.getChildren().addAll(propertyButtons);
         return vBox;
+    }
+
+    /**
+     * Toggle the display of information about clicked property in the borough window
+     * @param button property button clicked
+     * @param property property linked to the button
+     */
+    private void boroughPropertyToggled(ToggleButton button, AirbnbListing property)
+    {
+        if(button.isSelected()){
+            showDescription(property);
+        }
+        else{
+            root2.setCenter(null);
+        }
     }
 
     /**
@@ -750,7 +766,7 @@ public class View extends Application {
     private void showDescription(AirbnbListing property)
     {
         Label propertyDescription = new Label(mapInfo.showPropertyDescription(property.getId()));
-        root2.setRight(propertyDescription);
+        root2.setCenter(propertyDescription);
 
         viewedProperties.put(property.getId(), property);
         computeAvgPriceViewedProperties();
@@ -1011,8 +1027,9 @@ public class View extends Application {
 
         propertyScroll = new ScrollPane();
         propertyScroll.setId("results-scroll-pane");
-        propertyScroll.setPrefWidth(mapInfo.getPrefWidth() + 20);
+        propertyScroll.setPrefWidth(mapInfo.getPrefWidth() + 40);
         resultsPanel = new BorderPane();
+        resultsPanel.setId("results-panel");
         resultsPanel.setLeft(propertyScroll);
         searchEnginePanel = new SplitPane(topSearchPane, resultsPanel);
         searchEnginePanel.setId("search-panel");
@@ -1224,9 +1241,8 @@ public class View extends Application {
 
         // Create buttons to display the search results
         for (AirbnbListing property: searchResults) {
-            ToggleButton propertyInfo = new PropertyButton(property, mapInfo);
-            propertyInfo.setToggleGroup(propertiesToggleGroup);
-            propertyInfo.setOnAction(p ->propertyToggled(propertyInfo, property));
+            ToggleButton propertyInfo = new PropertyButton(property, mapInfo, propertiesToggleGroup);
+            propertyInfo.setOnAction(p ->searchPropertyToggled(propertyInfo, property));
             searchedResultsButtons.add(propertyInfo);
         }
         vBox.getChildren().addAll(searchedResultsButtons);
@@ -1238,7 +1254,7 @@ public class View extends Application {
      * @param button the property that button was toggeled
      * @param property the property linked to the button
      */
-    private void propertyToggled(ToggleButton button, AirbnbListing property)
+    private void searchPropertyToggled(ToggleButton button, AirbnbListing property)
     {
         if(button.isSelected()){
             showDetails(property);

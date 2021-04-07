@@ -41,6 +41,8 @@ public class MapPanel extends BorderPane {
     private ArrayList<Button> mapButtons;
     //Stores the buttons that represent the properties in each neighbourhood
     private ArrayList<ToggleButton> propertyButtons;
+    //Stores the info message displayed in the borough properties method when none is selected
+    private Label noPropertySelected;
 
 
     public MapPanel(View view, MapInfo mapInfo) {
@@ -225,7 +227,7 @@ public class MapPanel extends BorderPane {
             root2.setId("borough-pane");
 
             HBox topNav = new HBox();
-            topNav.setId("top-nav");
+            topNav.getStyleClass().add("top-nav");
 
             Label sortLabel = new Label("Sort by: ");
 
@@ -237,13 +239,19 @@ public class MapPanel extends BorderPane {
 
             root2.setTop(topNav);
 
-            //Creating the scrollbar and setting it to the center of the pane
+            //Creating the scrollbar and setting it to the left of the pane
             scrollBar = new ScrollPane();
             scrollBar.getStyleClass().add("results-scroll-pane");
             scrollBar.setPrefWidth(mapInfo.getPrefWidth() + 40);
             scrollBar.setContent(addPropertyInfo(boroughName));
             sortByNumReviews(boroughName);
             root2.setLeft(scrollBar);
+
+            //Create the info label displayed when no property is selected
+            noPropertySelected = new Label("No property selected");
+            noPropertySelected.setAlignment(Pos.CENTER);
+            noPropertySelected.getStyleClass().add("not-selected");
+            root2.setCenter(noPropertySelected);
 
             //Creating the scene of the stage
             Scene secondaryScene = new Scene(root2, 0.6*screenSize.getWidth(), 0.6*screenSize.getHeight());
@@ -363,7 +371,7 @@ public class MapPanel extends BorderPane {
         if (button.isSelected()) {
             showDescription(property);
         } else {
-            root2.setCenter(null);
+            root2.setCenter(noPropertySelected);
         }
     }
 
@@ -374,6 +382,7 @@ public class MapPanel extends BorderPane {
     private void showDescription(AirbnbListing property)
     {
         Label propertyDescription = new Label(mapInfo.showPropertyDescription(property.getId()));
+        propertyDescription.getStyleClass().add("property-description");
         root2.setCenter(propertyDescription);
 
         view.addViewedProperty(property);

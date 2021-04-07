@@ -38,6 +38,10 @@ public class SearchEnginePanel extends SplitPane {
     private Label resultsSize;
     //Stores an object containing the current properties available to show and extract from the map
     private MapInfo mapInfo;
+    //Stores the info message displayed in the borough properties method when none is selected
+    private Label noPropertySelected;
+    //Stores the info message displayed when no properties are found from the search
+    private Label noSearchResults;
     //The method to sort the search results, sorted by Relevancy by default
     private String sortMethod = "Relevancy (search similarity)";
 
@@ -85,6 +89,13 @@ public class SearchEnginePanel extends SplitPane {
 
         //Bottom pane is another split pane but this time vertically
 
+        noSearchResults = new Label("No search results");
+        noSearchResults.setAlignment(Pos.CENTER);
+        noSearchResults.getStyleClass().add("not-selected");
+        noPropertySelected = new Label("No property selected");
+        noPropertySelected.setAlignment(Pos.CENTER);
+        noPropertySelected.getStyleClass().add("not-selected");
+
         propertyScroll = new ScrollPane();
         propertyScroll.getStyleClass().add("results-scroll-pane");
         propertyScroll.setPrefWidth(mapInfo.getPrefWidth() + 40);
@@ -108,6 +119,8 @@ public class SearchEnginePanel extends SplitPane {
         Button searchButton = new Button("SEARCH");
         searchButton.setOnAction(event -> search(true));
         searchBar.getChildren().addAll(boroughsComboBox, searchField, searchButton);
+
+        clearOldSearch();
     }
 
     /**
@@ -159,9 +172,9 @@ public class SearchEnginePanel extends SplitPane {
      */
     private void clearSelectedProperty()
     {
-        if(resultsPanel.getCenter() != null)
+        if(resultsPanel.getCenter() != noPropertySelected)
         {
-            resultsPanel.setCenter(null);
+            resultsPanel.setCenter(noPropertySelected);
         }
     }
 
@@ -170,8 +183,8 @@ public class SearchEnginePanel extends SplitPane {
      */
     private void clearSearchResults()
     {
-        if(propertyScroll.getContent() != null){
-            propertyScroll.setContent(null);
+        if(propertyScroll.getContent() != noSearchResults){
+            propertyScroll.setContent(noSearchResults);
         }
     }
 
@@ -213,21 +226,11 @@ public class SearchEnginePanel extends SplitPane {
             List<AirbnbListing> searchResults =  properties.stream().filter(p -> p.getName().toLowerCase().contains(searchWord)).collect(Collectors.toList());
 
             switch (sortMethod) {
-                case "Relevancy (search similarity)":
-                    searchResults = sortByRelevancy(properties, searchWord);
-                    break;
-                case "Number of Reviews":
-                    sortByReviews(searchResults);
-                    break;
-                case "Price(Low - High)":
-                    sortByPriceLowToHigh(searchResults);
-                    break;
-                case "Price(High - Low)":
-                    sortByPriceHighToLow(searchResults);
-                    break;
-                case "Host Name(A - Z)":
-                    sortByHostName(searchResults);
-                    break;
+                case "Relevancy (search similarity)" -> searchResults = sortByRelevancy(properties, searchWord);
+                case "Number of Reviews" -> sortByReviews(searchResults);
+                case "Price(Low - High)" -> sortByPriceLowToHigh(searchResults);
+                case "Price(High - Low)" -> sortByPriceHighToLow(searchResults);
+                case "Host Name(A - Z)" -> sortByHostName(searchResults);
             }
 
             // If a specific borough is selected
@@ -343,6 +346,11 @@ public class SearchEnginePanel extends SplitPane {
      */
     private void showSearchResults(List<AirbnbListing> searchResults)
     {
+        if (searchResults.isEmpty()){
+            clearSearchResults();
+            return;
+        }
+
         VBox vBox = new VBox();
 
         vBox.setAlignment(Pos.TOP_CENTER);
@@ -383,6 +391,7 @@ public class SearchEnginePanel extends SplitPane {
     private void showDetails(AirbnbListing property)
     {
         Label propertyDescription = new Label(mapInfo.showPropertyDescription(property.getId()));
+        propertyDescription.getStyleClass().add("property-description");
         resultsPanel.setCenter(propertyDescription);
 
         view.addViewedProperty(property);

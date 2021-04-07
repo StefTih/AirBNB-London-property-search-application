@@ -307,7 +307,7 @@ public class MapInfo {
                 description = "Host name: "+property.getHost_name()
                         +"\nProperty name: "+property.getName()
                         +"\nBorough: "+property.getNeighbourhood()
-                        +"\nMinimum nights: "+property.getMinimumNights()
+                        +"\n\nMinimum nights: "+property.getMinimumNights()
                         +"\nPropertyID: "+property.getId()
                         +"\nLast Review: "+property.getLastReview()
                         +"\nRoom type: "+property.getRoom_type()
@@ -326,7 +326,7 @@ public class MapInfo {
     /**
      *
      * @param intString the string to be converted to Integer type
-     * @return the Integer value of the string, or -1 of the string is
+     * @return the Integer value of the string, or -1 if the string is
      * either empty or just whitespace
      */
     public Integer convertInt(String intString){

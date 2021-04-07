@@ -4,9 +4,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -19,7 +16,6 @@ import javafx.stage.Stage;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * This class represents the "Map Panel", as a BorderPane.
@@ -119,7 +115,7 @@ public class MapPanel extends BorderPane {
     }
 
     /**
-     * This method populates the map with neighbourhoods
+     * This method populates the map with neighbourhoods.
      */
     private void addBoroughsToMap()
     {
@@ -164,6 +160,9 @@ public class MapPanel extends BorderPane {
 
     }
 
+    /**
+     * This method links each (String) borough to its abbreviation.
+     */
     private void linkAbbreviations()
     {
         for (String[] neighbourhoods: mapInfo.getLondonBoroughs())
@@ -174,7 +173,8 @@ public class MapPanel extends BorderPane {
 
 
     /**
-     * This method creates a new grid pane which will help in the creation of the map
+     * This method creates a new grid pane which will help in the creation of the map.
+     * @return  The created Map (as GridPane)
      */
     private GridPane createMap()
     {

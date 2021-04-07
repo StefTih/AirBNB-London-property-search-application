@@ -271,7 +271,7 @@ public class SearchEnginePanel extends SplitPane {
                 appendSearchWordToFile(searchWord);
             }
 
-        } else if (searchField.getCharacters().isEmpty()) {
+        } else if (searchField.getCharacters().toString().trim().equals("")) {
             showEmptyFieldAlert();
         }
     }

@@ -160,11 +160,11 @@ public class View extends Application {
         fromComboBox = new ComboBox(); // DropDown List for minimum price
         String[] fromItems = new String[] {
                 "0", "50", "100", "150", "200", "250", "300", "350", "400", "450", "500", "1000"};
-        addItemsToComboBox(fromComboBox, fromItems);
+        fromComboBox.getItems().addAll(fromItems);
         fromComboBox.setOnAction(this:: fromComboBoxAction);
         toComboBox = new ComboBox(); // DropDown List for maximum price
         String[] toItems = new String[] {"50", "100", "150", "200", "250", "300", "350", "400", "450", "500", "1000", "10000"};
-        addItemsToComboBox(toComboBox, toItems);
+        toComboBox.getItems().addAll(toItems);
         toComboBox.setOnAction(this:: toComboBoxAction);
         priceRangeComponents.getChildren().addAll(fromLabel, fromComboBox, toLabel, toComboBox);
 
@@ -319,18 +319,6 @@ public class View extends Application {
     {
         namedPanels.get(prevIndex).getLabel().setTextFill(new Color(0, 0, 0, 1));
         namedPanels.get(currentIndex).getLabel().setTextFill(new Color(0.286, 0.592, 0.922, 1));
-    }
-
-    /**
-     * Add all items from an array into a ComboBox
-     * @param comboBox The ComboBox to add the items into
-     * @param items The array of items to add to the ComboBox
-     */
-    private void addItemsToComboBox(ComboBox comboBox, String[] items)
-    {
-        for (String item: items) {
-            comboBox.getItems().add(item);
-        }
     }
 
 

@@ -71,7 +71,7 @@ public class SearchEnginePanel extends SplitPane {
         //Bottom pane is another split pane but this time vertically
 
         propertyScroll = new ScrollPane();
-        propertyScroll.setId("results-scroll-pane");
+        propertyScroll.getStyleClass().add("results-scroll-pane");
         propertyScroll.setPrefWidth(mapInfo.getPrefWidth() + 40);
         resultsPanel = new BorderPane();
         resultsPanel.setId("results-panel");

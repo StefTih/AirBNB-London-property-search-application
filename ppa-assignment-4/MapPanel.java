@@ -239,7 +239,8 @@ public class MapPanel extends BorderPane {
 
             //Creating the scrollbar and setting it to the center of the pane
             scrollBar = new ScrollPane();
-            scrollBar.setPrefWidth(mapInfo.getPrefWidth() + 20);
+            scrollBar.getStyleClass().add("results-scroll-pane");
+            scrollBar.setPrefWidth(mapInfo.getPrefWidth() + 40);
             scrollBar.setContent(addPropertyInfo(boroughName));
             sortByNumReviews(boroughName);
             root2.setLeft(scrollBar);

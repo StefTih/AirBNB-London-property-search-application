@@ -92,24 +92,7 @@
 
 #borough-pane{
     -fx-background-color: #ffffff;
-}
-
-#borough-pane .menu-bar{
-    -fx-background-color: #ffffff;
-    -fx-font-family: "Arial";
-    -fx-font-size: 13;
-}
-
-#borough-pane .menu-bar .menu:hover{
-    -fx-background-color: #4997eb;
-}
-
-#borough-pane .menu-bar .menu:showing{
-    -fx-background-color: #4997eb;
-}
-
-#borough-pane .menu-bar .menu .menu-item:hover{
-    -fx-background-color: #4997eb;
+    -fx-padding: 10;
 }
 
 #top-nav{
@@ -209,11 +192,11 @@
     -fx-padding:10;
 }
 
-#results-scroll-pane .viewport{
+.results-scroll-pane .viewport{
     -fx-background-color: transparent;
 }
 
-#results-scroll-pane{
+.results-scroll-pane{
     -fx-padding: 10;
     -fx-background-color: #ffffff;
     -fx-border-color: #000000;

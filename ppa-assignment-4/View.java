@@ -82,9 +82,7 @@ public class View extends Application {
      * @throws Exception
      */
     @Override
-    public void start(Stage primaryStage) throws Exception{
-
-        //Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
+    public void start(Stage primaryStage) {
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 

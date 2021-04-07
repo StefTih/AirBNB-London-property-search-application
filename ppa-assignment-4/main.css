@@ -112,6 +112,13 @@
     -fx-background-color: #4997eb;
 }
 
+#top-nav{
+    -fx-padding: 10;
+    -fx-spacing: 10;
+    -fx-alignment: center-left;
+    -fx-font-size: 13;
+}
+
 #main-top .label{
     -fx-padding: 10;
 }

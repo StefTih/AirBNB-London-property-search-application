@@ -10,6 +10,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -18,6 +19,7 @@ import javafx.stage.Stage;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * This class represents the "Map Panel", as a BorderPane.
@@ -39,6 +41,7 @@ public class MapPanel extends BorderPane {
     private ArrayList<Button> mapButtons;
     //Stores the buttons that represent the properties in each neighbourhood
     private ArrayList<ToggleButton> propertyButtons;
+
 
     public MapPanel(View view, MapInfo mapInfo) {
         super();
@@ -221,13 +224,24 @@ public class MapPanel extends BorderPane {
             root2 = new BorderPane();
             root2.setId("borough-pane");
 
-            //Creating the top menu options
-            makeMenuBar(boroughName);
+            HBox topNav = new HBox();
+            topNav.setId("top-nav");
+
+            Label sortLabel = new Label("Sort by: ");
+
+            ComboBox<String> sortCombo = new ComboBox();
+            sortCombo.setPromptText("Number of Reviews");
+            sortCombo.getItems().addAll("Number of Reviews", "Price(Low - High)", "Price(High - Low)", "Host Name(A - Z)");
+            sortCombo.setOnAction(event -> sortSelected(sortCombo.getSelectionModel().getSelectedItem(), boroughName));
+            topNav.getChildren().addAll(sortLabel, sortCombo);
+
+            root2.setTop(topNav);
 
             //Creating the scrollbar and setting it to the center of the pane
             scrollBar = new ScrollPane();
             scrollBar.setPrefWidth(mapInfo.getPrefWidth() + 20);
             scrollBar.setContent(addPropertyInfo(boroughName));
+            sortByNumReviews(boroughName);
             root2.setLeft(scrollBar);
 
             //Creating the scene of the stage
@@ -246,29 +260,20 @@ public class MapPanel extends BorderPane {
     }
 
     /**
-     * This method creates the menu bar which contains the sorting options for the user
+     * Sort the list of properties according to the sorting method chosen by the user.
+     * @param type The selected sorting method
+     * @param boroughName The name of the concerned borough
      */
-    private void makeMenuBar(String boroughName)
+    private void sortSelected(String type, String boroughName)
     {
-        MenuBar menuBar = new javafx.scene.control.MenuBar();
-
-        // create the sort menu
-        Menu sortMenu = new javafx.scene.control.Menu("Sort By");
-
-        MenuItem numReviews = new javafx.scene.control.MenuItem("Number of Reviews");
-        numReviews.setOnAction(p -> sortByNumReviews(boroughName));
-
-        MenuItem price = new javafx.scene.control.MenuItem("Price - cheapest to most expensive");
-        price.setOnAction(p -> sortByPrice(boroughName));
-
-        MenuItem hostName = new MenuItem("Host name");
-        hostName.setOnAction(p -> sortByHostName(boroughName));
-
-        sortMenu.getItems().addAll(numReviews,price,hostName);
-        menuBar.getMenus().addAll(sortMenu);
-        root2.setTop(menuBar);
-
+        switch (type) {
+            case "Number of Reviews" -> sortByNumReviews(boroughName);
+            case "Price(Low - High)" -> sortByPriceLowToHigh(boroughName);
+            case "Price(High - Low)" -> sortByPriceHighToLow(boroughName);
+            case "Host Name(A - Z)" -> sortByHostName(boroughName);
+        }
     }
+
 
     /**
      * This method calls the sorting method in the MapInfo class based on number of reviews.
@@ -284,9 +289,19 @@ public class MapPanel extends BorderPane {
      * This method calls the sorting method in the MapInfo class based on price.
      * @param boroughName the parameter which stores the name of the neighbourhood
      */
-    private void sortByPrice(String boroughName)
+    private void sortByPriceLowToHigh(String boroughName)
     {
-        mapInfo.sortPropertyByPrice();
+        mapInfo.sortPropertyByPriceLowToHigh();
+        refresh(boroughName);
+    }
+
+    /**
+     * This method calls the sorting method in the MapInfo class based on price.
+     * @param boroughName the parameter which stores the name of the neighbourhood
+     */
+    private void sortByPriceHighToLow(String boroughName)
+    {
+        mapInfo.sortPropertyByPriceHighToLow();
         refresh(boroughName);
     }
 

@@ -103,21 +103,6 @@ public class MapInfo {
     }
 
     /**
-     * For extendability purposes we included a method which can remove boroughs from the map
-     * @param name stores the name of the borough
-     */
-    public void removeBoroughs(String name)
-    {
-        for(int i = 0; i<LondonBoroughs.length; i++) {
-            if (LondonBoroughs[i][0].equals(name))
-            {
-                LondonBoroughs[i][0] = "";
-            }
-
-        }
-    }
-
-    /**
      * Link an abbreviation to its borough.
      * @param abbreviation The borough's abbreviation
      * @param borough The borough to link the abbreviation to
@@ -153,15 +138,6 @@ public class MapInfo {
             }
         }
         return key;
-    }
-    /**
-     * For extensibility purposes we included a accessor method which can access the total number
-     * of neighbourhoods on the map.
-     * @return an integer which show the total number of neighbourhoods on the map
-     */
-    public int returnTotalNumNeighbourhoods()
-    {
-        return LondonBoroughs.length;
     }
 
     /**
@@ -262,10 +238,9 @@ public class MapInfo {
      */
     public void sortPropertyByNumReviews()
     {
-        Collections.sort(propertyList, new Comparator<AirbnbListing>() {
-            public int compare(AirbnbListing property1, AirbnbListing property2)
-            {
-                return Integer.valueOf(property2.getNumberOfReviews()).compareTo(property1.getNumberOfReviews());
+        propertyList.sort(new Comparator<AirbnbListing>() {
+            public int compare(AirbnbListing property1, AirbnbListing property2) {
+                return Integer.compare(property2.getNumberOfReviews(), property1.getNumberOfReviews());
             }
         });
     }
@@ -276,12 +251,26 @@ public class MapInfo {
      * method which is able to return the ordered version of the arrayList in descending order.
      * Inspiration taken from: link: https://youtube.be/wzWFQTLn8hl
      */
-    public void sortPropertyByPrice()
+    public void sortPropertyByPriceLowToHigh()
     {
-        Collections.sort(propertyList, new Comparator<AirbnbListing>() {
-            public int compare(AirbnbListing property1, AirbnbListing property2)
-            {
-                return Integer.valueOf(property1.getPrice()).compareTo(property2.getPrice());
+        propertyList.sort(new Comparator<AirbnbListing>() {
+            public int compare(AirbnbListing property1, AirbnbListing property2) {
+                return Integer.compare(property1.getPrice(), property2.getPrice());
+            }
+        });
+    }
+
+    /**
+     * This method sorts all the properties within a given range by their price from most expensive to cheapest.
+     * It uses a comparator and a collections class as well as a sort
+     * method which is able to return the ordered version of the arrayList in descending order.
+     * Inspiration taken from: link: https://youtube.be/wzWFQTLn8hl
+     */
+    public void sortPropertyByPriceHighToLow()
+    {
+        propertyList.sort(new Comparator<AirbnbListing>() {
+            public int compare(AirbnbListing property1, AirbnbListing property2) {
+                return -Integer.compare(property1.getPrice(), property2.getPrice());
             }
         });
     }
@@ -294,9 +283,8 @@ public class MapInfo {
      */
     public void sortPropertyByHostName()
     {
-        Collections.sort(propertyList, new Comparator<AirbnbListing>() {
-            public int compare(AirbnbListing property1, AirbnbListing property2)
-            {
+        propertyList.sort(new Comparator<AirbnbListing>() {
+            public int compare(AirbnbListing property1, AirbnbListing property2) {
                 return String.valueOf(property1.getHost_name()).compareTo(property2.getHost_name());
             }
         });
@@ -319,7 +307,7 @@ public class MapInfo {
                 description = "Host name: "+property.getHost_name()
                         +"\nProperty name: "+property.getName()
                         +"\nBorough: "+property.getNeighbourhood()
-                        +"\nMinimum nights: "+property.getMinimumNights()
+                        +"\n\nMinimum nights: "+property.getMinimumNights()
                         +"\nPropertyID: "+property.getId()
                         +"\nLast Review: "+property.getLastReview()
                         +"\nRoom type: "+property.getRoom_type()
@@ -338,7 +326,7 @@ public class MapInfo {
     /**
      *
      * @param intString the string to be converted to Integer type
-     * @return the Integer value of the string, or -1 of the string is
+     * @return the Integer value of the string, or -1 if the string is
      * either empty or just whitespace
      */
     public Integer convertInt(String intString){

@@ -229,11 +229,21 @@ public class SearchEnginePanel extends SplitPane {
 
             // Sort the search results according the method selected by the user
             switch (sortMethod) {
-                case "Relevancy (search similarity)" -> searchResults = sortByRelevancy(properties, searchWord);
-                case "Number of Reviews" -> sortByReviews(searchResults);
-                case "Price(Low - High)" -> sortByPriceLowToHigh(searchResults);
-                case "Price(High - Low)" -> sortByPriceHighToLow(searchResults);
-                case "Host Name(A - Z)" -> sortByHostName(searchResults);
+                case "Relevancy (search similarity)":
+                    searchResults = sortByRelevancy(properties, searchWord);
+                    break;
+                case "Number of Reviews":
+                    sortByReviews(searchResults);
+                    break;
+                case "Price(Low - High)":
+                    sortByPriceLowToHigh(searchResults);
+                    break;
+                case "Price(High - Low)":
+                    sortByPriceHighToLow(searchResults);
+                    break;
+                case "Host Name(A - Z)":
+                    sortByHostName(searchResults);
+                    break;
             }
 
             // If a specific borough is selected

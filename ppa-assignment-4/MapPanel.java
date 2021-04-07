@@ -276,10 +276,18 @@ public class MapPanel extends BorderPane {
     private void sortSelected(String type, String boroughName)
     {
         switch (type) {
-            case "Number of Reviews" -> sortByNumReviews(boroughName);
-            case "Price(Low - High)" -> sortByPriceLowToHigh(boroughName);
-            case "Price(High - Low)" -> sortByPriceHighToLow(boroughName);
-            case "Host Name(A - Z)" -> sortByHostName(boroughName);
+            case "Number of Reviews":
+                sortByNumReviews(boroughName);
+                break;
+            case "Price(Low - High)":
+                sortByPriceLowToHigh(boroughName);
+                break;
+            case "Price(High - Low)":
+                sortByPriceHighToLow(boroughName);
+                break;
+            case "Host Name(A - Z)":
+                sortByHostName(boroughName);
+                break;
         }
     }
 

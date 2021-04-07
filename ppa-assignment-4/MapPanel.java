@@ -4,6 +4,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
@@ -46,60 +48,6 @@ public class MapPanel extends BorderPane {
         initialiseMapPanel();
     }
 
-
-    /**
-     * This method populates the map with neighbourhoods
-     */
-    private void addBoroughsToMap()
-    {
-        mapInfo.addBoroughs(0, "Enfield", "7", "0");
-        mapInfo.addBoroughs(1, "Barnet", "4", "1");
-        mapInfo.addBoroughs(2, "Haringey", "6", "1");
-        mapInfo.addBoroughs(3, "Waltham Forest", "8", "1");
-        mapInfo.addBoroughs(4, "Harrow", "1", "2");
-        mapInfo.addBoroughs(5, "Brent", "3", "2");
-        mapInfo.addBoroughs(6, "Camden", "5", "2");
-        mapInfo.addBoroughs(7, "Islington", "7", "2");
-        mapInfo.addBoroughs(8, "Hackney", "9", "2");
-        mapInfo.addBoroughs(9, "Redbridge", "11", "2");
-        mapInfo.addBoroughs(10, "Havering", "13", "2");
-        mapInfo.addBoroughs(11, "Hillingdon", "0", "3");
-        mapInfo.addBoroughs(12, "Ealing", "2", "3");
-        mapInfo.addBoroughs(13, "Kensington and Chelsea", "4", "3");
-        mapInfo.addBoroughs(14, "Westminster", "6", "3");
-        mapInfo.addBoroughs(15, "Tower Hamlets", "8", "3");
-        mapInfo.addBoroughs(16, "Newham", "10", "3");
-        mapInfo.addBoroughs(17, "Barking and Dagenham", "12", "3");
-        mapInfo.addBoroughs(18, "Hounslow", "1", "4");
-        mapInfo.addBoroughs(19, "Hammersmith and Fulham", "3", "4");
-        mapInfo.addBoroughs(20, "Wandsworth", "5", "4");
-        mapInfo.addBoroughs(21, "City of London", "7", "4");
-        mapInfo.addBoroughs(22, "Greenwich", "9", "4");
-        mapInfo.addBoroughs(23, "Bexley", "11", "4");
-        mapInfo.addBoroughs(24, "Richmond upon Thames", "2", "5");
-        mapInfo.addBoroughs(25, "Merton", "4", "5");
-        mapInfo.addBoroughs(26, "Lambeth", "6", "5");
-        mapInfo.addBoroughs(27, "Southwark", "8", "5");
-        mapInfo.addBoroughs(28, "Lewisham", "10", "5");
-        mapInfo.addBoroughs(29, "Kingston upon Thames", "3", "6");
-        mapInfo.addBoroughs(30, "Sutton", "5", "6");
-        mapInfo.addBoroughs(31, "Croydon", "7", "6");
-        mapInfo.addBoroughs(32, "Bromley", "9", "6");
-
-
-        linkAbbreviations();
-
-        londonBoroughs = mapInfo.getLondonBoroughs();
-
-    }
-
-    private void linkAbbreviations()
-    {
-        for (String[] neighbourhoods: mapInfo.getLondonBoroughs())
-        {
-            mapInfo.addAbbreviations(neighbourhoods[0].substring(0,4).toUpperCase(),neighbourhoods[0]);
-        }
-    }
 
     /**
      This method creates the user interface for the map panel.
@@ -166,6 +114,61 @@ public class MapPanel extends BorderPane {
     }
 
     /**
+     * This method populates the map with neighbourhoods
+     */
+    private void addBoroughsToMap()
+    {
+        mapInfo.addBoroughs(0, "Enfield", "7", "0");
+        mapInfo.addBoroughs(1, "Barnet", "4", "1");
+        mapInfo.addBoroughs(2, "Haringey", "6", "1");
+        mapInfo.addBoroughs(3, "Waltham Forest", "8", "1");
+        mapInfo.addBoroughs(4, "Harrow", "1", "2");
+        mapInfo.addBoroughs(5, "Brent", "3", "2");
+        mapInfo.addBoroughs(6, "Camden", "5", "2");
+        mapInfo.addBoroughs(7, "Islington", "7", "2");
+        mapInfo.addBoroughs(8, "Hackney", "9", "2");
+        mapInfo.addBoroughs(9, "Redbridge", "11", "2");
+        mapInfo.addBoroughs(10, "Havering", "13", "2");
+        mapInfo.addBoroughs(11, "Hillingdon", "0", "3");
+        mapInfo.addBoroughs(12, "Ealing", "2", "3");
+        mapInfo.addBoroughs(13, "Kensington and Chelsea", "4", "3");
+        mapInfo.addBoroughs(14, "Westminster", "6", "3");
+        mapInfo.addBoroughs(15, "Tower Hamlets", "8", "3");
+        mapInfo.addBoroughs(16, "Newham", "10", "3");
+        mapInfo.addBoroughs(17, "Barking and Dagenham", "12", "3");
+        mapInfo.addBoroughs(18, "Hounslow", "1", "4");
+        mapInfo.addBoroughs(19, "Hammersmith and Fulham", "3", "4");
+        mapInfo.addBoroughs(20, "Wandsworth", "5", "4");
+        mapInfo.addBoroughs(21, "City of London", "7", "4");
+        mapInfo.addBoroughs(22, "Greenwich", "9", "4");
+        mapInfo.addBoroughs(23, "Bexley", "11", "4");
+        mapInfo.addBoroughs(24, "Richmond upon Thames", "2", "5");
+        mapInfo.addBoroughs(25, "Merton", "4", "5");
+        mapInfo.addBoroughs(26, "Lambeth", "6", "5");
+        mapInfo.addBoroughs(27, "Southwark", "8", "5");
+        mapInfo.addBoroughs(28, "Lewisham", "10", "5");
+        mapInfo.addBoroughs(29, "Kingston upon Thames", "3", "6");
+        mapInfo.addBoroughs(30, "Sutton", "5", "6");
+        mapInfo.addBoroughs(31, "Croydon", "7", "6");
+        mapInfo.addBoroughs(32, "Bromley", "9", "6");
+
+
+        linkAbbreviations();
+
+        londonBoroughs = mapInfo.getLondonBoroughs();
+
+    }
+
+    private void linkAbbreviations()
+    {
+        for (String[] neighbourhoods: mapInfo.getLondonBoroughs())
+        {
+            mapInfo.addAbbreviations(neighbourhoods[0].substring(0,4).toUpperCase(),neighbourhoods[0]);
+        }
+    }
+
+
+    /**
      * This method creates a new grid pane which will help in the creation of the map
      */
     private GridPane createMap()
@@ -222,9 +225,10 @@ public class MapPanel extends BorderPane {
             makeMenuBar(boroughName);
 
             //Creating the scrollbar and setting it to the center of the pane
-            scrollBar = new javafx.scene.control.ScrollPane();
+            scrollBar = new ScrollPane();
+            scrollBar.setPrefWidth(mapInfo.getPrefWidth() + 20);
             scrollBar.setContent(addPropertyInfo(boroughName));
-            root2.setCenter(scrollBar);
+            root2.setLeft(scrollBar);
 
             //Creating the scene of the stage
             Scene secondaryScene = new Scene(root2, 0.6*screenSize.getWidth(), 0.6*screenSize.getHeight());
@@ -246,18 +250,18 @@ public class MapPanel extends BorderPane {
      */
     private void makeMenuBar(String boroughName)
     {
-        javafx.scene.control.MenuBar menuBar = new javafx.scene.control.MenuBar();
+        MenuBar menuBar = new javafx.scene.control.MenuBar();
 
         // create the sort menu
-        javafx.scene.control.Menu sortMenu = new javafx.scene.control.Menu("Sort By");
+        Menu sortMenu = new javafx.scene.control.Menu("Sort By");
 
-        javafx.scene.control.MenuItem numReviews = new javafx.scene.control.MenuItem("Number of Reviews");
+        MenuItem numReviews = new javafx.scene.control.MenuItem("Number of Reviews");
         numReviews.setOnAction(p -> sortByNumReviews(boroughName));
 
-        javafx.scene.control.MenuItem price = new javafx.scene.control.MenuItem("Price - cheapest to most expensive");
+        MenuItem price = new javafx.scene.control.MenuItem("Price - cheapest to most expensive");
         price.setOnAction(p -> sortByPrice(boroughName));
 
-        javafx.scene.control.MenuItem hostName = new MenuItem("Host name");
+        MenuItem hostName = new MenuItem("Host name");
         hostName.setOnAction(p -> sortByHostName(boroughName));
 
         sortMenu.getItems().addAll(numReviews,price,hostName);
@@ -319,16 +323,32 @@ public class MapPanel extends BorderPane {
         vBox.setAlignment(Pos.TOP_CENTER);
         propertyButtons = new ArrayList<>();
 
+        ToggleGroup propertiesToggleGroup = new ToggleGroup();
+
 
         for(AirbnbListing propertyInfo: mapInfo.getPropertyList(boroughName))
         {
-            ToggleButton property = new PropertyButton(propertyInfo, mapInfo);
+            ToggleButton property = new PropertyButton(propertyInfo, mapInfo, propertiesToggleGroup);
             propertyButtons.add(property);
-            property.setOnAction(p ->showDescription(propertyInfo));
+            property.setOnAction(p -> boroughPropertyToggled(property, propertyInfo));
         }
 
         vBox.getChildren().addAll(propertyButtons);
         return vBox;
+    }
+
+    /**
+     * Toggle the display of information about clicked property in the borough window.
+     * @param button Button clicked
+     * @param property Property linked to the button
+     */
+    private void boroughPropertyToggled(ToggleButton button, AirbnbListing property)
+    {
+        if (button.isSelected()) {
+            showDescription(property);
+        } else {
+            root2.setCenter(null);
+        }
     }
 
     /**
@@ -338,7 +358,7 @@ public class MapPanel extends BorderPane {
     private void showDescription(AirbnbListing property)
     {
         Label propertyDescription = new Label(mapInfo.showPropertyDescription(property.getId()));
-        root2.setRight(propertyDescription);
+        root2.setCenter(propertyDescription);
 
         view.addViewedProperty(property);
     }

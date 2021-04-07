@@ -179,21 +179,35 @@
     -fx-border-color: #4997eb;
 }
 
-#results-scroll-pane .toggle-button{
+.property-button{
     -fx-background-color: #ffffff;
     -fx-border-color: #4997eb;
     -fx-border-width: 1, 0, 1, 0;
 }
 
-#results-scroll-pane .toggle-button:hover{
+.property-button:hover{
     -fx-background-color: #eaf3fd;
 }
 
-#results-scroll-pane .toggle-button:pressed{
+.property-button:pressed{
     -fx-background-color: #68a9ee;
 }
 
-#results-scroll-pane .toggle-button:selected{
+.property-button:selected{
     -fx-text-fill: #ffffff;
     -fx-background-color: #6cabef;
+}
+
+#results-panel{
+    -fx-padding:10;
+}
+
+#results-scroll-pane .viewport{
+    -fx-background-color: transparent;
+}
+
+#results-scroll-pane{
+    -fx-padding: 10;
+    -fx-background-color: #ffffff;
+    -fx-border-color: #000000;
 }

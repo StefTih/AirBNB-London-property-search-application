@@ -72,8 +72,9 @@ public class SearchEnginePanel extends SplitPane {
 
         propertyScroll = new ScrollPane();
         propertyScroll.setId("results-scroll-pane");
-        propertyScroll.setPrefWidth(mapInfo.getPrefWidth() + 20);
+        propertyScroll.setPrefWidth(mapInfo.getPrefWidth() + 40);
         resultsPanel = new BorderPane();
+        resultsPanel.setId("results-panel");
         resultsPanel.setLeft(propertyScroll);
 
         getItems().setAll(topSearchPane, resultsPanel);
@@ -245,9 +246,8 @@ public class SearchEnginePanel extends SplitPane {
 
         // Create buttons to display the search results
         for (AirbnbListing property: searchResults) {
-            ToggleButton propertyInfo = new PropertyButton(property, mapInfo);
-            propertyInfo.setToggleGroup(propertiesToggleGroup);
-            propertyInfo.setOnAction(p ->propertyToggled(propertyInfo, property));
+            ToggleButton propertyInfo = new PropertyButton(property, mapInfo, propertiesToggleGroup);
+            propertyInfo.setOnAction(p -> searchPropertyToggled(propertyInfo, property));
             searchedResultsButtons.add(propertyInfo);
         }
         vBox.getChildren().addAll(searchedResultsButtons);
@@ -259,7 +259,7 @@ public class SearchEnginePanel extends SplitPane {
      * @param button the property that button was toggeled
      * @param property the property linked to the button
      */
-    private void propertyToggled(ToggleButton button, AirbnbListing property)
+    private void searchPropertyToggled(ToggleButton button, AirbnbListing property)
     {
         if(button.isSelected()){
             showDetails(property);

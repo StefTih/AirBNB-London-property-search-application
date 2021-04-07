@@ -307,6 +307,7 @@ public class MapInfo {
                 description = "Host name: "+property.getHost_name()
                         +"\nProperty name: "+property.getName()
                         +"\nBorough: "+property.getNeighbourhood()
+                        +"\nPrice: \u00A3"+property.getPrice()
                         +"\n\nMinimum nights: "+property.getMinimumNights()
                         +"\nPropertyID: "+property.getId()
                         +"\nLast Review: "+property.getLastReview()

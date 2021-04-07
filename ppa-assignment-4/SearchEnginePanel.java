@@ -12,6 +12,8 @@ import javafx.scene.layout.VBox;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,6 +39,8 @@ public class SearchEnginePanel extends SplitPane {
     private Label resultsSize;
     //Stores an object containing the current properties available to show and extract from the map
     private MapInfo mapInfo;
+    //The method to sort the search results, sorted by Relevancy by default
+    private String sortMethod = "Relevancy (search similarity)";
 
 
     public SearchEnginePanel(View view, MapInfo mapInfo) {
@@ -66,7 +70,19 @@ public class SearchEnginePanel extends SplitPane {
         resultsSize = new Label();
         resultsSize.setPadding(new Insets(0, 20, 0, 20));
         BorderPane.setAlignment(resultsSize, Pos.CENTER_LEFT);
-        topSearchPane.setLeft(resultsSize);
+        topSearchPane.setRight(resultsSize);
+
+        //Top BorderPane holds a HBox that allows the user to choose a sorting method for the results
+        HBox sortingMethodsBar = new HBox();
+        sortingMethodsBar.getStyleClass().add("top-nav");
+        topSearchPane.setLeft(sortingMethodsBar);
+        Label sortByLabel = new Label("Sort by: ");
+        ComboBox<String> sortingMethods = new ComboBox<>();
+        sortingMethods.getItems().addAll("Relevancy (search similarity)", "Number of Reviews", "Price(Low - High)", "Price(High - Low)", "Host Name(A - Z)");
+        sortingMethods.setPromptText("Relevancy (search similarity)");
+        sortingMethods.setOnAction(event -> sort(sortingMethods.getSelectionModel().getSelectedItem()));
+        sortingMethodsBar.getChildren().addAll(sortByLabel, sortingMethods);
+
 
         //Bottom pane is another split pane but this time vertically
 
@@ -91,7 +107,7 @@ public class SearchEnginePanel extends SplitPane {
         searchField.setPrefWidth(300);
         searchField.setOnKeyPressed(this::searchKeyPressed);
         Button searchButton = new Button("SEARCH");
-        searchButton.setOnAction(event -> search(event, true));
+        searchButton.setOnAction(event -> search(true));
         searchBar.getChildren().addAll(boroughsComboBox, searchField, searchButton);
     }
 
@@ -125,7 +141,7 @@ public class SearchEnginePanel extends SplitPane {
      */
     public void searchUpdate(Node centerPane) {
         if (centerPane == this && propertyScroll.getContent() != null && !searchField.getCharacters().toString().trim().equals("")) {
-            search(null, false);
+            search(false);
         }
     }
 
@@ -135,7 +151,7 @@ public class SearchEnginePanel extends SplitPane {
      */
     private void searchKeyPressed(KeyEvent event) {
         if (event.getCode().equals(KeyCode.ENTER)) {
-            search(null, true);
+            search(true);
         }
     }
 
@@ -172,10 +188,21 @@ public class SearchEnginePanel extends SplitPane {
     }
 
     /**
-     * Search for properties according to the prefix specified in the Text Field.
-     * @param event The ActionEvent triggered by the user
+     * Sort the search results according to the sorting method selected by the user.
+     * @param sortingMethod The select method to sort the search results
      */
-    private void search(ActionEvent event, boolean storeExpression) {
+    private void sort(String sortingMethod) {
+        sortMethod = sortingMethod;
+        if (propertyScroll.getContent() != null) {
+            search(false);
+        }
+    }
+
+    /**
+     * Search for properties according to the prefix specified in the Text Field.
+     * @param storeExpression Whether the expression should be stored in the search-words.txt file
+     */
+    private void search(boolean storeExpression) {
         clearOldSearch();
         if (! (searchField.getCharacters().toString().trim().equals("") || view.invalidPriceRange())) {
             // Search for properties within the selected price range and corresponding with the search prefix
@@ -184,12 +211,25 @@ public class SearchEnginePanel extends SplitPane {
             // Collection of all properties in the current selected price range
             ArrayList<AirbnbListing> properties = view.getProperties();
 
-            // Properties whose name EQUALS the searched expression (order of pertinance)
-            List<AirbnbListing> searchResults =  properties.stream().filter(p -> p.getName().toLowerCase().equals(searchWord)).collect(Collectors.toList());
-            // Properties whose name STARTSWITH the searched expression
-            properties.stream().filter(p -> p.getName().toLowerCase().startsWith(searchWord) && !(p.getName().toLowerCase().equals(searchWord))).forEach(searchResults::add);
-            // Properties whose name CONTAINS the searched expression
-            properties.stream().filter(p -> p.getName().toLowerCase().contains(searchWord) && !(p.getName().toLowerCase().startsWith(searchWord))).forEach(searchResults::add);
+            List<AirbnbListing> searchResults =  properties.stream().filter(p -> p.getName().toLowerCase().contains(searchWord)).collect(Collectors.toList());
+
+            switch (sortMethod) {
+                case "Relevancy (search similarity)":
+                    searchResults = sortByRelevancy(properties, searchWord);
+                    break;
+                case "Number of Reviews":
+                    sortByReviews(searchResults);
+                    break;
+                case "Price(Low - High)":
+                    sortByPriceLowToHigh(searchResults);
+                    break;
+                case "Price(High - Low)":
+                    sortByPriceHighToLow(searchResults);
+                    break;
+                case "Host Name(A - Z)":
+                    sortByHostName(searchResults);
+                    break;
+            }
 
             // If a specific borough is selected
             if (selectedBorough != null && (! selectedBorough.equals("ALL BOROUGHS"))) {
@@ -219,6 +259,72 @@ public class SearchEnginePanel extends SplitPane {
         } else if (searchField.getCharacters().isEmpty()) {
             showEmptyFieldAlert();
         }
+    }
+
+    /**
+     * Sort the search results by relevancy (first the properties with the same name, then the properties whose name
+     * starts with the expression and then finally those whose name contains the expression).
+     * @param properties The list of all properties within the specified price range
+     * @param searchWord The expression searched by the user
+     * @return The list of search results sorted by relevancy
+     */
+    private List<AirbnbListing> sortByRelevancy(ArrayList<AirbnbListing> properties, String searchWord) {
+        // Properties whose name EQUALS the searched expression (order of pertinance)
+        List<AirbnbListing> searchResults =  properties.stream().filter(p -> p.getName().toLowerCase().equals(searchWord)).collect(Collectors.toList());
+        // Properties whose name STARTSWITH the searched expression
+        properties.stream().filter(p -> p.getName().toLowerCase().startsWith(searchWord) && !(p.getName().toLowerCase().equals(searchWord))).forEach(searchResults::add);
+        // Properties whose name CONTAINS the searched expression
+        properties.stream().filter(p -> p.getName().toLowerCase().contains(searchWord) && !(p.getName().toLowerCase().startsWith(searchWord))).forEach(searchResults::add);
+
+        return searchResults;
+    }
+
+    /**
+     * Sort the search results by the number of reviews of each property.
+     * @param searchResults The non-sorted search results
+     */
+    private void sortByReviews(List<AirbnbListing> searchResults) {
+        searchResults.sort(new Comparator<AirbnbListing>() {
+            public int compare(AirbnbListing property1, AirbnbListing property2) {
+                return Integer.compare(property2.getNumberOfReviews(), property1.getNumberOfReviews());
+            }
+        });
+    }
+
+    /**
+     * Sort the search results by the price of each property, from low to high.
+     * @param searchResults The non-sorted search results
+     */
+    private void sortByPriceLowToHigh(List<AirbnbListing> searchResults) {
+        searchResults.sort(new Comparator<AirbnbListing>() {
+            public int compare(AirbnbListing property1, AirbnbListing property2) {
+                return Integer.compare(property1.getPrice(), property2.getPrice());
+            }
+        });
+    }
+
+    /**
+     * Sort the search results by the price of each property, from high to low.
+     * @param searchResults The non-sorted search results
+     */
+    private void sortByPriceHighToLow(List<AirbnbListing> searchResults) {
+        searchResults.sort(new Comparator<AirbnbListing>() {
+            public int compare(AirbnbListing property1, AirbnbListing property2) {
+                return -Integer.compare(property1.getPrice(), property2.getPrice());
+            }
+        });
+    }
+
+    /**
+     * Sort the search results by the the host name of each property.
+     * @param searchResults The non-sorted search results
+     */
+    private void sortByHostName(List<AirbnbListing> searchResults) {
+        searchResults.sort(new Comparator<AirbnbListing>() {
+            public int compare(AirbnbListing property1, AirbnbListing property2) {
+                return String.valueOf(property1.getHost_name()).compareTo(property2.getHost_name());
+            }
+        });
     }
 
     /**

@@ -238,9 +238,8 @@ public class MapInfo {
      */
     public void sortPropertyByNumReviews()
     {
-        Collections.sort(propertyList, new Comparator<AirbnbListing>() {
-            public int compare(AirbnbListing property1, AirbnbListing property2)
-            {
+        propertyList.sort(new Comparator<AirbnbListing>() {
+            public int compare(AirbnbListing property1, AirbnbListing property2) {
                 return Integer.compare(property2.getNumberOfReviews(), property1.getNumberOfReviews());
             }
         });
@@ -254,10 +253,9 @@ public class MapInfo {
      */
     public void sortPropertyByPriceLowToHigh()
     {
-        Collections.sort(propertyList, new Comparator<AirbnbListing>() {
-            public int compare(AirbnbListing property1, AirbnbListing property2)
-            {
-                return Integer.valueOf(property1.getPrice()).compareTo(property2.getPrice());
+        propertyList.sort(new Comparator<AirbnbListing>() {
+            public int compare(AirbnbListing property1, AirbnbListing property2) {
+                return Integer.compare(property1.getPrice(), property2.getPrice());
             }
         });
     }
@@ -270,10 +268,9 @@ public class MapInfo {
      */
     public void sortPropertyByPriceHighToLow()
     {
-        Collections.sort(propertyList, new Comparator<AirbnbListing>() {
-            public int compare(AirbnbListing property1, AirbnbListing property2)
-            {
-                return - Integer.valueOf(property1.getPrice()).compareTo(property2.getPrice());
+        propertyList.sort(new Comparator<AirbnbListing>() {
+            public int compare(AirbnbListing property1, AirbnbListing property2) {
+                return -Integer.compare(property1.getPrice(), property2.getPrice());
             }
         });
     }
@@ -286,13 +283,11 @@ public class MapInfo {
      */
     public void sortPropertyByHostName()
     {
-        Collections.sort(propertyList, new Comparator<AirbnbListing>() {
-            public int compare(AirbnbListing property1, AirbnbListing property2)
-            {
+        propertyList.sort(new Comparator<AirbnbListing>() {
+            public int compare(AirbnbListing property1, AirbnbListing property2) {
                 return String.valueOf(property1.getHost_name()).compareTo(property2.getHost_name());
             }
         });
-        System.out.println(propertyList);
     }
 
     /**

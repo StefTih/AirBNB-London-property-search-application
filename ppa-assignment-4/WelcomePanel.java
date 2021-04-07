@@ -56,6 +56,9 @@ public class WelcomePanel extends BorderPane {
         welcomeBottomPane.setId("welcome-bottom");
         welcomeBottomPane.setAlignment(Pos.CENTER);
 
+
+        // These components show the price range currently selected by the user
+
         Label welcomePriceInfoLabel = new Label("Selected price range: ");
         welcomePriceInfoLabel.setWrapText(true);
         welcomePriceInfoLabel.getStyleClass().addAll("welcome-price");
@@ -82,6 +85,8 @@ public class WelcomePanel extends BorderPane {
     /**
      * Update the label on the welcome page to display the price range selected by the user
      * @param invalid true if the range selected by the user is invalid
+     * @param fromPrice The lower bound of the selected price range
+     * @param toPrice The higher bound of the selected price range
      */
     public void showPriceRange(boolean invalid, Integer fromPrice, Integer toPrice)
     {

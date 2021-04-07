@@ -46,6 +46,8 @@ public class StatisticBox extends BorderPane {
 
         this.getStyleClass().add("statistic-cell");
 
+        // Arrows to navigate between statistics
+
         leftArrow = new Button("<");
         leftArrow.setPrefSize(0.04*screenWidth, 0.4*screenHeight);
         leftArrow.setAlignment(Pos.CENTER);
@@ -58,6 +60,8 @@ public class StatisticBox extends BorderPane {
         rightArrow.setOnAction(this:: nextStatistic);
         setRight(rightArrow);
 
+
+        // The components to show the statistic
 
         BorderPane statistic = new BorderPane();
         setCenter(statistic);

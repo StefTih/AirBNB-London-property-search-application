@@ -87,7 +87,7 @@ public class SearchEnginePanel extends SplitPane {
         sortingMethodsBar.getChildren().addAll(sortByLabel, sortingMethods);
 
 
-        //Bottom pane is another split pane but this time vertically
+        //Pane to display search results
 
         noSearchResults = new Label("No search results");
         noSearchResults.setAlignment(Pos.CENTER);
@@ -107,6 +107,8 @@ public class SearchEnginePanel extends SplitPane {
         setId("search-panel");
         setOrientation(Orientation.VERTICAL);
         setDividerPosition(0, 0.1);
+
+        //Components to allow searching of properties
 
         boroughsComboBox = new ComboBox<>();
         boroughsComboBox.setPromptText("ALL BOROUGHS");
@@ -225,12 +227,23 @@ public class SearchEnginePanel extends SplitPane {
 
             List<AirbnbListing> searchResults =  properties.stream().filter(p -> p.getName().toLowerCase().contains(searchWord)).collect(Collectors.toList());
 
+            // Sort the search results according the method selected by the user
             switch (sortMethod) {
-                case "Relevancy (search similarity)" -> searchResults = sortByRelevancy(properties, searchWord);
-                case "Number of Reviews" -> sortByReviews(searchResults);
-                case "Price(Low - High)" -> sortByPriceLowToHigh(searchResults);
-                case "Price(High - Low)" -> sortByPriceHighToLow(searchResults);
-                case "Host Name(A - Z)" -> sortByHostName(searchResults);
+                case "Relevancy (search similarity)":
+                    searchResults = sortByRelevancy(properties, searchWord);
+                    break;
+                case "Number of Reviews":
+                    sortByReviews(searchResults);
+                    break;
+                case "Price(Low - High)":
+                    sortByPriceLowToHigh(searchResults);
+                    break;
+                case "Price(High - Low)":
+                    sortByPriceHighToLow(searchResults);
+                    break;
+                case "Host Name(A - Z)":
+                    sortByHostName(searchResults);
+                    break;
             }
 
             // If a specific borough is selected
@@ -258,7 +271,7 @@ public class SearchEnginePanel extends SplitPane {
                 appendSearchWordToFile(searchWord);
             }
 
-        } else if (searchField.getCharacters().isEmpty()) {
+        } else if (searchField.getCharacters().toString().trim().equals("")) {
             showEmptyFieldAlert();
         }
     }
@@ -343,6 +356,7 @@ public class SearchEnginePanel extends SplitPane {
 
     /**
      * Show the search results.
+     * @param searchResults The search results to display to the user
      */
     private void showSearchResults(List<AirbnbListing> searchResults)
     {

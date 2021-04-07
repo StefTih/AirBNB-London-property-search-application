@@ -79,12 +79,9 @@ public class View extends Application {
     /**
      * Start the JavaFx Application
      * @param primaryStage The stage of the GUI
-     * @throws Exception
      */
     @Override
-    public void start(Stage primaryStage) throws Exception{
-
-        //Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
+    public void start(Stage primaryStage) {
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 

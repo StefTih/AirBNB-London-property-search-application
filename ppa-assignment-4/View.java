@@ -321,7 +321,6 @@ public class View extends Application {
         namedPanels.get(currentIndex).getLabel().setTextFill(new Color(0.286, 0.592, 0.922, 1));
     }
 
-
     // General methods
 
     /**
@@ -524,7 +523,4 @@ public class View extends Application {
         }
         return searchedExpressions;
     }
-
-
-
 }

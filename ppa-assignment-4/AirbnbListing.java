@@ -85,6 +85,7 @@ public class AirbnbListing {
         this.availability365 = availability365;
     }
 
+
     public String getId() {
         return id;
     }
@@ -165,4 +166,6 @@ public class AirbnbListing {
                 ", availability365=" + availability365 +
                 '}';
     }
+
+
 }

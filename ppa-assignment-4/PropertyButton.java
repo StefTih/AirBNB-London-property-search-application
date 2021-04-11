@@ -18,8 +18,8 @@ public class PropertyButton extends ToggleButton {
                 + "\nNumber of reviews: "+property.getNumberOfReviews()
                 + "\nMinimum nights: "+property.getMinimumNights());
 
-        this.setToggleGroup(toggleGroup);
-        this.getStyleClass().add("property-button");
+        setToggleGroup(toggleGroup);
+        getStyleClass().add("property-button");
         setPadding(vBoxPadding);
         setPrefWidth(mapInfo.getPrefWidth());
         setAlignment(Pos.BASELINE_LEFT);

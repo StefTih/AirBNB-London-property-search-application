@@ -16,14 +16,6 @@ public class NamedPanel {
     }
 
     /**
-     * Get the Panel
-     * @return The stored Panel
-     */
-    public Parent getPanel() {
-        return panel;
-    }
-
-    /**
      * Get the Panel's given name
      * @return The Panel's name
      */

@@ -17,17 +17,18 @@ import java.util.ArrayList;
 
 public class StatisticBox extends BorderPane {
 
-    private View view;
+    private StatisticsPanel statisticsPanel;
     private Button leftArrow, rightArrow;
     private Label statisticName, statisticValue;
     private int statisticIndex = -1;
+    // Collection of all Statistic objects
     private ArrayList<Statistic> statistics;
 
-    public StatisticBox(View view) {
+    public StatisticBox(StatisticsPanel statisticsPanel, ArrayList<Statistic> statistics) {
         super();
 
-        this.view = view;
-        this.statistics = view.getStatistics();
+        this.statisticsPanel = statisticsPanel;
+        this.statistics = statistics;
 
         initialiseComponents();
 
@@ -45,6 +46,8 @@ public class StatisticBox extends BorderPane {
 
         this.getStyleClass().add("statistic-cell");
 
+        // Arrows to navigate between statistics
+
         leftArrow = new Button("<");
         leftArrow.setPrefSize(0.04*screenWidth, 0.4*screenHeight);
         leftArrow.setAlignment(Pos.CENTER);
@@ -57,6 +60,8 @@ public class StatisticBox extends BorderPane {
         rightArrow.setOnAction(this:: nextStatistic);
         setRight(rightArrow);
 
+
+        // The components to show the statistic
 
         BorderPane statistic = new BorderPane();
         setCenter(statistic);
@@ -81,7 +86,7 @@ public class StatisticBox extends BorderPane {
      */
     private void previousStatistic(ActionEvent event) {
         statisticIndex = (statisticIndex-1+statistics.size())%(statistics.size());
-        while (view.statisticUsed(this, statisticIndex)) {
+        while (statisticsPanel.statisticUsed(this, statisticIndex)) {
             statisticIndex = (statisticIndex-1+statistics.size())%(statistics.size());
         }
         setStatistic();
@@ -94,7 +99,7 @@ public class StatisticBox extends BorderPane {
      */
     private void nextStatistic(ActionEvent event) {
         statisticIndex = (statisticIndex+1)%(statistics.size());
-        while (view.statisticUsed(this, statisticIndex)) {
+        while (statisticsPanel.statisticUsed(this, statisticIndex)) {
             statisticIndex = (statisticIndex+1)%(statistics.size());
         }
         setStatistic();
